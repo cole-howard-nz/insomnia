@@ -15,7 +15,8 @@ const PRIVATE_TABLES = [
 	'userCriteriaDone',
 	'practiceSessions',
 	'practiceSessionStops',
-	'levelEvents'
+	'levelEvents',
+	'evidence'
 ];
 
 const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');

@@ -66,7 +66,12 @@ export const userSettings = pgTable('user_settings', {
 		.references(() => users.id, { onDelete: 'cascade' }),
 	weeklyTargetDays: integer('weekly_target_days').notNull().default(3),
 	reducedEffects: boolean('reduced_effects').notNull().default(false),
-	remindersEnabled: boolean('reminders_enabled').notNull().default(false)
+	remindersEnabled: boolean('reminders_enabled').notNull().default(false),
+	/** Onboarding answers. Kept so the suggestions can be explained and revisited. */
+	experience: text(),
+	chasing: text().notNull().default(''),
+	/** Rain ambience is opt-in and remembered per account. */
+	rainSound: boolean('rain_sound').notNull().default(false)
 });
 
 export type User = typeof users.$inferSelect;

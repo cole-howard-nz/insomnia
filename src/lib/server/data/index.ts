@@ -9,4 +9,5 @@ export * from './settings';
 export * from './progress';
 export * from './practice';
 export * from './export';
+export * from './evidence';
 export * from './files';

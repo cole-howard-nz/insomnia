@@ -60,6 +60,7 @@
 		"@sveltejs/adapter-vercel": "^6.3.4",
 		"@upstash/ratelimit": "^2.2.0",
 		"@upstash/redis": "^1.39.0",
+		"@vercel/blob": "^2.8.0",
 		"drizzle-orm": "^0.45.2",
 		"zod": "^4.6.5"
 	}
