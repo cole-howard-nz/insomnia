@@ -7,6 +7,7 @@
 	import type { Milestone } from '$lib/progress/model';
 	import { getProgressContext } from '$lib/progress/store.svelte';
 	import Button from './Button.svelte';
+	import EvidencePanel from './EvidencePanel.svelte';
 	import {
 		LEVEL_NAMES,
 		UNSEEN,
@@ -189,6 +190,8 @@
 			{/each}
 		</ul>
 	</section>
+
+	<EvidencePanel {stop} />
 
 	<section aria-labelledby="notes-heading">
 		<h3 id="notes-heading">notes</h3>

@@ -2,29 +2,12 @@ import { and, asc, desc, eq, sql } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { evidence, levelEvents, userStopProgress } from '$lib/server/db/schema';
 import { MAX_USER_BYTES, type EvidenceKind } from '$lib/evidence/config';
+import type { EvidenceItem, LevelEventItem } from '$lib/evidence/types';
 import { getStorage } from '$lib/server/storage';
 
 // Evidence rows. Every function takes `userId` first and scopes by it. The file behind a
 // row is fetched by its id and the owner, so an id from a URL never reaches the storage
 // layer without an ownership check. Storage keys are never sent to the client.
-
-export interface EvidenceItem {
-	id: string;
-	stopId: number;
-	kind: EvidenceKind;
-	levelAt: number;
-	note: string;
-	mime: string | null;
-	bytes: number;
-	durationSeconds: number | null;
-	createdAt: string;
-}
-
-export interface LevelEventItem {
-	fromLevel: number;
-	toLevel: number;
-	createdAt: string;
-}
 
 const columns = {
 	id: evidence.id,
