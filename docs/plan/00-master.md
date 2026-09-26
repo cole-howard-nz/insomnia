@@ -20,7 +20,7 @@ Kickoff prompt template:
 | Phase | File | Goal | Status |
 |---|---|---|---|
 | 0 | [01-phase-0-foundations.md](01-phase-0-foundations.md) | Scaffold, design system, weather background on a phone | Done (phone perf check and preview deploy deferred by owner) |
-| 1 | [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md) | Curriculum data, map, list view, stop detail (no accounts) | Not started |
+| 1 | [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md) | Curriculum data, map, list view, stop detail (no accounts) | Done except two owner checks (phone smoothness, preview deploy) |
 | 2 | [03-phase-2-accounts.md](03-phase-2-accounts.md) | Authentication and account management | Not started |
 | 3 | [04-phase-3-core-loop.md](04-phase-3-core-loop.md) | Progress, criteria, practice log, rust, what next, weather | Not started |
 | 4 | [05-phase-4-evidence-and-polish.md](05-phase-4-evidence-and-polish.md) | Evidence, timeline, onboarding, landing, privacy | Not started |
@@ -72,16 +72,24 @@ Append newest at the bottom: date, phase, decision, reason.
 | 2026-09-26 | 0 | Playwright runs against the dev server on Pixel 5 emulation | adapter-vercel build needs symlinks, which fail on Windows without Developer Mode; webkit not installed |
 | 2026-09-26 | 0 | Closed phase 0 with phone frame rate and preview deploy unverified | Owner will check the phone later; looks good on desktop. Deploy needs the Vercel CLI or a git push |
 | 2026-09-26 | 0 | Lightened `--text-dim` to `#9296a0`, capped cloud alpha at 0.3 | Secondary text failed AA over the brightest cloud state |
+| 2026-09-26 | 1 | Curriculum is read from the database, not the source files | One source of truth once progress rows reference stop and criterion ids |
+| 2026-09-26 | 1 | Criteria are archived, not deleted, when removed from source | Users tick criteria by id, so ids must survive edits |
+| 2026-09-26 | 1 | Resources are search links for now | Never rot, never point at unvetted content. Curate later |
+| 2026-09-26 | 1 | Cross-region links are only drawn for the open stop | Songs link to skills all over, drawing them all makes the map unreadable |
+| 2026-09-26 | 1 | `/` is the public map preview, the redirect to `/map` is gone | Seed of the phase 4 landing page |
+| 2026-09-26 | 1 | Closed phase 1 with phone smoothness and preview deploy unverified | No phone or Vercel CLI in the session. Owner to check |
 
 ## Parking lot
 
 Ideas that came up but belong to a later phase or v1.5. Append only.
 
--
+- Hand-tuned, less grid-like map layout (phase 1 generates a grid).
+- Toggle to show all cross-region links on the map.
+- Curated resource links to replace the search links.
 
 ## Phase handoff summary
 
 Each finished phase adds two or three lines here: what exists now, where the key code lives, anything the next session must know.
 
 - Phase 0 (done, owner deferred phone perf check and preview deploy): scaffold, tokens, UI kit, weather background, tab bar shell. See the handoff notes in [01-phase-0-foundations.md](01-phase-0-foundations.md). Weather store is `src/lib/weather.svelte.ts`, Sheet is `src/lib/components/Sheet.svelte`.
-
+- Phase 1 (done except two owner checks): curriculum in `src/lib/curriculum/` (62 stops, seeded to Neon), map/list/stop sheet under `src/routes/(app)/map/`, public preview at `/`. `MapView` takes a `states` record, phase 3 feeds it real progress via `src/lib/map-state.svelte.ts`. See handoff notes in [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md).

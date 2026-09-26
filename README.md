@@ -12,6 +12,8 @@ vercel env pull .env.local   # DATABASE_URL and friends, never committed
 npm run dev                  # http://localhost:5173, use --host to open it on a phone
 ```
 
+The curriculum lives in [src/lib/curriculum/](src/lib/curriculum/). After `npm run db:migrate`, run `npm run db:seed` to load it.
+
 Open `/dev/weather` to drag the sky through its range and preview the UI kit.
 
 ## Scripts
@@ -27,7 +29,8 @@ Open `/dev/weather` to drag the sky through its range and preview the UI kit.
 | `npm run db:ping`                     | Confirm the database is reachable       |
 | `npm run db:generate` / `db:migrate`  | Drizzle migrations (unpooled connection) |
 | `npm run db:push` / `db:studio`       | Push schema, browse data                |
-| `npm run db:seed`                     | Load the curriculum (phase 1)           |
+| `npm run db:seed`                     | Load the curriculum (idempotent)        |
+| `npm run curriculum:layout`           | Regenerate the map layout after editing stops |
 
 ## Stack
 
