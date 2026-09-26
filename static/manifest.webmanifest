@@ -1,0 +1,11 @@
+{
+	"name": "Insomnia",
+	"short_name": "Insomnia",
+	"description": "a map of what to learn on guitar, and what you've let go quiet.",
+	"start_url": "/map",
+	"display": "standalone",
+	"orientation": "portrait",
+	"background_color": "#0c0d10",
+	"theme_color": "#0c0d10",
+	"icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
