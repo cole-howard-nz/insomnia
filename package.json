@@ -21,7 +21,8 @@
 		"db:studio": "drizzle-kit studio",
 		"db:seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
 		"db:ping": "tsx --env-file=.env.local scripts/db-ping.ts",
-		"curriculum:layout": "tsx scripts/layout.ts"
+		"curriculum:layout": "tsx scripts/layout.ts",
+		"icons": "tsx scripts/icons.ts"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
