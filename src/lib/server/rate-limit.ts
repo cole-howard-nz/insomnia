@@ -34,6 +34,7 @@ const resetAccount = makeLimiter('reset:account', 3, 60, '1 h');
 const tokenIp = makeLimiter('token:ip', 20, 10, '10 m');
 const resendUser = makeLimiter('resend:user', 3, 60, '1 h');
 const sensitiveUser = makeLimiter('sensitive:user', 5, 5, '5 m');
+const uploadUser = makeLimiter('upload:user', 20, 10, '10 m');
 
 const ipKey = (ip: string | null) => ip ?? 'unknown';
 
@@ -62,3 +63,7 @@ export const checkResendRateLimit = (userId: string) =>
 /** Password-confirmed actions (change password or email, delete). Stops password guessing from a stolen session. */
 export const checkSensitiveRateLimit = (userId: string) =>
 	checkAll([{ limiter: sensitiveUser, identifier: userId }]);
+
+/** Evidence uploads. Generous for real use, and a ceiling on a script hammering storage. */
+export const checkUploadRateLimit = (userId: string) =>
+	checkAll([{ limiter: uploadUser, identifier: userId }]);

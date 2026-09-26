@@ -10,11 +10,26 @@ import {
 	userStopProgress,
 	users
 } from '$lib/server/db/schema';
+import { getStorage } from '$lib/server/storage';
+import { zipStream } from '$lib/server/zip';
+import { listEvidenceKeys } from './evidence';
 import { getSettings } from './settings';
 
+/** The name a recording has inside the zip export. */
+export function evidenceFileName(e: {
+	storageKey: string | null;
+	mime: string | null;
+	createdAt: Date;
+}) {
+	const ext = (e.mime ?? '').split('/')[1]?.replace('x-', '').replace('mpeg', 'mp3') || 'bin';
+	const stamp = e.createdAt.toISOString().replace(/[:.]/g, '-');
+	const id = (e.storageKey ?? '').split('/').pop()?.slice(0, 8) ?? 'file';
+	return `evidence/${stamp}-${id}.${ext}`;
+}
+
 /**
- * Everything the app holds about one user, as plain JSON. Later phases add their
- * tables (evidence metadata) as new keys. Stops are named by slug so the file reads
+ * Everything the app holds about one user, as plain JSON. Recordings are
+ * listed here and included by `exportUserZip`. Stops are named by slug so the file reads
  * without the curriculum. Never includes the password hash or session and token hashes.
  */
 export async function exportUserData(userId: string) {
@@ -83,6 +98,11 @@ export async function exportUserData(userId: string) {
 		.where(eq(levelEvents.userId, userId))
 		.orderBy(asc(levelEvents.createdAt));
 
+	const evidenceRows = await listEvidenceKeys(userId);
+	const slugById = new Map(
+		(await db.select({ id: stops.id, slug: stops.slug }).from(stops)).map((s) => [s.id, s.slug])
+	);
+
 	return {
 		exportedAt: new Date().toISOString(),
 		account: account ?? null,
@@ -99,6 +119,47 @@ export async function exportUserData(userId: string) {
 				.filter((x) => x.sessionId === s.id)
 				.map((x) => ({ stop: x.stop, bpm: x.bpm }))
 		})),
-		levelEvents: events
+		levelEvents: events,
+		// Files are in the zip export, at `file`. A note has no file.
+		evidence: evidenceRows
+			.slice()
+			.reverse()
+			.map((e) => ({
+				stop: slugById.get(e.stopId) ?? null,
+				kind: e.kind,
+				levelAt: e.levelAt,
+				note: e.note,
+				durationSeconds: e.durationSeconds,
+				attachedAt: e.createdAt,
+				file: e.storageKey ? evidenceFileName(e) : null
+			}))
 	};
+}
+
+/** The JSON export plus every recording, as a streamed zip. */
+export async function exportUserZip(userId: string) {
+	const [data, files] = await Promise.all([exportUserData(userId), listEvidenceKeys(userId)]);
+	const storage = getStorage();
+	return zipStream([
+		{
+			name: 'insomnia-export.json',
+			data: async () => new TextEncoder().encode(JSON.stringify(data, null, 2))
+		},
+		...files.flatMap((e) =>
+			e.storageKey
+				? [
+						{
+							name: evidenceFileName(e),
+							modified: e.createdAt,
+							data: async () => {
+								const stored = await storage.get(e.storageKey!);
+								return stored
+									? new Uint8Array(await new Response(stored.stream).arrayBuffer())
+									: new Uint8Array();
+							}
+						}
+					]
+				: []
+		)
+	]);
 }
