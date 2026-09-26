@@ -12,6 +12,8 @@ describe('safeNext', () => {
 			'https://evil.test',
 			'//evil.test',
 			'/\\evil.test',
+			'/\t/evil.test',
+			'/\n/evil.test',
 			'evil',
 			'',
 			null,

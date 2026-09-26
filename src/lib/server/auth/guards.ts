@@ -2,9 +2,19 @@ import { error, redirect } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { SessionInfo, SessionUser } from './session';
 
+const hasControlChar = (value: string) =>
+	[...value].some((char) => char.charCodeAt(0) < 0x20 || char.charCodeAt(0) === 0x7f);
+
 /** Only same-site relative paths are followed after sign-in. */
 export function safeNext(next: string | null | undefined): string {
-	if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) {
+	// Browsers drop tabs and newlines inside URLs, so '/<tab>/host' would become '//host'.
+	if (
+		!next ||
+		hasControlChar(next) ||
+		!next.startsWith('/') ||
+		next.startsWith('//') ||
+		next.startsWith('/\\')
+	) {
 		return '/map';
 	}
 	return next;
