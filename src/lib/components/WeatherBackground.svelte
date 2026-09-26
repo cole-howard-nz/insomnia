@@ -14,6 +14,8 @@
 	let lowPower = $state(false);
 	let lowRes = $state(false);
 	let webglFailed = $state(false);
+	// The shader waits until the page has painted and gone quiet, so it never competes with load.
+	let shaderReady = $state(false);
 
 	// The governor steps quality down when real frame times say the sky is too heavy.
 	let tier = $state(0);
@@ -24,6 +26,11 @@
 
 	onMount(() => {
 		mounted = true;
+
+		const start = () => (shaderReady = true);
+		const idle = window.requestIdleCallback
+			? window.requestIdleCallback(start, { timeout: 2500 })
+			: window.setTimeout(start, 800);
 
 		const motion = matchMedia('(prefers-reduced-motion: reduce)');
 		reducedMotion = motion.matches;
@@ -51,7 +58,11 @@
 			battery.addEventListener('chargingchange', update);
 		});
 
-		return () => motion.removeEventListener('change', onMotion);
+		return () => {
+			motion.removeEventListener('change', onMotion);
+			if (window.cancelIdleCallback) window.cancelIdleCallback(idle);
+			else window.clearTimeout(idle);
+		};
 	});
 
 	// Watches frame times in short windows while the sky animates, and steps down one tier
@@ -98,7 +109,7 @@
 </script>
 
 <!-- CSS sky: first paint, and the fallback when WebGL is unavailable. No shader involved. -->
-{#if !mounted || webglFailed}
+{#if !mounted || !shaderReady || webglFailed}
 	<div class="css-sky" aria-hidden="true" style:--density={params.cloudDensity}>
 		<span class="blob b1"></span>
 		<span class="blob b2"></span>
@@ -106,7 +117,7 @@
 	</div>
 {/if}
 
-{#if mounted && !webglFailed}
+{#if mounted && shaderReady && !webglFailed}
 	<CloudBackground
 		density={params.cloudDensity}
 		brightness={params.cloudBrightness}
