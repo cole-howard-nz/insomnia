@@ -1,7 +1,7 @@
-import { UNSEEN, type CurriculumData, type StopState } from './curriculum/model';
+import { type CurriculumData, type StopState } from './curriculum/model';
 
-// Placeholder for phase 3, when real progress feeds the map. Until then every
-// stop is Unseen, and in dev a toggle cycles the stops through every state.
+// Dev only: a toggle that shows every stop in every state, to check how the map draws
+// them. Real progress comes from the progress store.
 
 const CYCLE: StopState[] = [
 	{ level: 0, rusting: false },
@@ -18,11 +18,11 @@ class MapState {
 	/** Dev only: show every state on the map. */
 	preview = $state(false);
 
-	/** The state of each stop, by slug. */
+	/** Every stop cycled through every state, by slug. */
 	for(data: CurriculumData): Record<string, StopState> {
 		const out: Record<string, StopState> = {};
 		data.stops.forEach((s, i) => {
-			out[s.slug] = this.preview ? CYCLE[i % CYCLE.length] : UNSEEN;
+			out[s.slug] = CYCLE[i % CYCLE.length];
 		});
 		return out;
 	}

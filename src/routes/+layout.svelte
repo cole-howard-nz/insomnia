@@ -1,11 +1,19 @@
 <script lang="ts">
 	import './layout.css';
-	import type { Snippet } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import WeatherBackground from '$lib/components/WeatherBackground.svelte';
 	import ToastStack from '$lib/components/ToastStack.svelte';
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
 
 	let { children }: { children: Snippet } = $props();
+
+	// Days are the player's own, so the server needs to know their timezone.
+	onMount(() => {
+		const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		if (zone && !document.cookie.split('; ').includes(`tz=${encodeURIComponent(zone)}`)) {
+			document.cookie = `tz=${encodeURIComponent(zone)}; path=/; max-age=31536000; samesite=lax`;
+		}
+	});
 </script>
 
 <svelte:head>

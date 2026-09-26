@@ -33,13 +33,19 @@
 		index,
 		states = {},
 		selected,
-		query = ''
+		query = '',
+		ignited = null,
+		cleared = []
 	}: {
 		index: CurriculumIndex;
 		states?: Record<string, StopState>;
 		selected?: string;
 		/** Appended to stop links, e.g. "?view=map". */
 		query?: string;
+		/** The stop that just levelled up, which glows once. */
+		ignited?: { slug: string; key: number } | null;
+		/** Regions where every stop is Solid or better: cold light on the district. */
+		cleared?: string[];
 	} = $props();
 
 	const NODE_R = 14;
@@ -288,7 +294,7 @@
 			<g transform="translate({view.x} {view.y}) scale({view.k})">
 				{#each hulls as { region, path } (region.slug)}
 					<g class="region" class:tappable={!detail}>
-						<path class="hull" d={path} />
+						<path class="hull" class:cleared={cleared.includes(region.slug)} d={path} />
 						{#if !detail}
 							<rect
 								class="region-hit"
@@ -346,7 +352,12 @@
 								{#if selected === stop.slug}
 									<circle class="selection" r={NODE_R + 10} />
 								{/if}
-								<StopGlyph {state} kind={stop.kind} r={NODE_R} />
+								<StopGlyph
+									{state}
+									kind={stop.kind}
+									r={NODE_R}
+									ignite={ignited?.slug === stop.slug ? ignited.key : 0}
+								/>
 								{#if detail}
 									<text class="label" y={NODE_R + 20} text-anchor="middle" aria-hidden="true">
 										{#each lines as line, i (i)}
@@ -404,6 +415,13 @@
 		fill: color-mix(in srgb, var(--bg-cloud) 55%, transparent);
 		stroke: var(--line);
 		stroke-width: 1.5;
+	}
+	.hull.cleared {
+		fill: color-mix(in srgb, var(--clear) 9%, var(--bg-cloud));
+		stroke: color-mix(in srgb, var(--clear) 55%, var(--line));
+		transition:
+			fill 1.5s,
+			stroke 1.5s;
 	}
 	.region-name {
 		font-family: var(--font-display);

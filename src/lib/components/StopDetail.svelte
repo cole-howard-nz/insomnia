@@ -1,5 +1,12 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { resolve } from '$app/paths';
+	import { celebrate } from '$lib/celebrate.svelte';
+	import { send } from '$lib/progress/api';
+	import { daysSince } from '$lib/progress/logic';
+	import type { Milestone } from '$lib/progress/model';
+	import { getProgressContext } from '$lib/progress/store.svelte';
+	import Button from './Button.svelte';
 	import {
 		LEVEL_NAMES,
 		UNSEEN,
@@ -9,7 +16,7 @@
 	} from '$lib/curriculum/model';
 	import Stamp from './Stamp.svelte';
 
-	/** The body of the stop sheet. Read-only until progress arrives in phase 3. */
+	/** The body of the stop sheet: what the stop is, and the user's own progress on it. */
 	let {
 		index,
 		stop,
@@ -17,7 +24,9 @@
 		query = ''
 	}: { index: CurriculumIndex; stop: StopModel; current?: StopState; query?: string } = $props();
 
+	const progress = getProgressContext();
 	const region = $derived(index.region(stop.regionSlug));
+	const row = $derived(progress.row(stop.id));
 	const levels = [2, 3, 4] as const;
 
 	// Links run both ways, so each direction gets its own sentence.
@@ -37,6 +46,50 @@
 		root?.parentElement?.scrollTo({ top: 0 });
 	});
 
+	// Ticking changes the level at once. The request follows, and a failure reloads the truth.
+	async function toggle(criterionId: number, done: boolean) {
+		const { from, to } = progress.tick(stop, criterionId, done);
+		if (to > from && to >= 2) celebrate.levelUp(stop.slug, to);
+		const res = await send<{ level: number; milestones: Milestone[] }>('/progress/criteria', {
+			criterionId,
+			done
+		});
+		if (res) celebrate.milestones(res.milestones, (slug) => index.region(slug)?.name ?? slug);
+	}
+
+	async function start() {
+		progress.start(stop.id);
+		await send('/progress/stop', { slug: stop.slug, start: true });
+	}
+
+	// Notes and best tempo save when the field is left, not on every key.
+	let notes = $state('');
+	let bpm = $state('');
+	$effect(() => {
+		void stop.slug;
+		untrack(() => {
+			notes = row?.notes ?? '';
+			bpm = row?.bestBpm?.toString() ?? '';
+		});
+	});
+
+	async function saveNotes() {
+		if (notes === (row?.notes ?? '')) return;
+		progress.saveDetails(stop.id, { notes });
+		await send('/progress/stop', { slug: stop.slug, notes });
+	}
+
+	async function saveBpm() {
+		const value = bpm.trim() === '' ? null : Number(bpm);
+		if (value !== null && (!Number.isInteger(value) || value < 20 || value > 400)) {
+			bpm = row?.bestBpm?.toString() ?? '';
+			return;
+		}
+		if (value === (row?.bestBpm ?? null)) return;
+		progress.saveDetails(stop.id, { bestBpm: value });
+		await send('/progress/stop', { slug: stop.slug, bestBpm: value });
+	}
+
 	const href = (slug: string) => `${resolve('/(app)/map/[stop]', { stop: slug })}${query}`;
 	const kindLabel = { video: 'video', tab: 'tab', article: 'read', exercise: 'drill' } as const;
 </script>
@@ -53,11 +106,36 @@
 		{#if current.rusting}<Stamp tone="rust">rusting</Stamp>{/if}
 	</p>
 
+	{#if current.rusting && row?.lastPracticedAt}
+		<p class="rust-note">
+			it's been {daysSince(row.lastPracticedAt, progress.now)} days. it misses you. play it for a minute,
+			or re-tick the top criteria.
+		</p>
+	{/if}
+
 	<p class="summary">{stop.summary}</p>
 
-	{#if stop.targetBpm}
-		<p class="bpm text-dim">target tempo <strong>{stop.targetBpm} bpm</strong></p>
+	{#if current.level === 0}
+		<Button variant="ghost" onclick={start}>start learning this</Button>
 	{/if}
+
+	<div class="tempo">
+		{#if stop.targetBpm}
+			<p class="text-dim">target tempo <strong>{stop.targetBpm} bpm</strong></p>
+		{/if}
+		<label class="best">
+			<span class="text-dim">your best</span>
+			<input
+				type="text"
+				inputmode="numeric"
+				placeholder="bpm"
+				autocomplete="off"
+				bind:value={bpm}
+				onblur={saveBpm}
+				onkeydown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+			/>
+		</label>
+	</div>
 
 	<section aria-labelledby="criteria-heading">
 		<h3 id="criteria-heading">what counts</h3>
@@ -66,7 +144,17 @@
 				<h4>{LEVEL_NAMES[level]}</h4>
 				<ul class="criteria">
 					{#each stop.criteria.filter((c) => c.level === level) as criterion (criterion.id)}
-						<li>{criterion.text}</li>
+						<li>
+							<label>
+								<input
+									type="checkbox"
+									checked={progress.done.has(criterion.id)}
+									onchange={(e) => toggle(criterion.id, e.currentTarget.checked)}
+								/>
+								<span class="box" aria-hidden="true"></span>
+								<span>{criterion.text}</span>
+							</label>
+						</li>
 					{/each}
 				</ul>
 			</div>
@@ -104,7 +192,14 @@
 
 	<section aria-labelledby="notes-heading">
 		<h3 id="notes-heading">notes</h3>
-		<p class="text-dim">your notes for this one will live here.</p>
+		<label class="sr-only" for="notes">notes for {stop.name}</label>
+		<textarea
+			id="notes"
+			rows="3"
+			maxlength="4000"
+			placeholder="what clicked, what didn't. only you see this."
+			bind:value={notes}
+			onblur={saveNotes}></textarea>
 	</section>
 </div>
 
@@ -153,19 +248,74 @@
 		flex-direction: column;
 		gap: 0.35rem;
 	}
-	.criteria li {
+	.criteria label {
 		position: relative;
-		padding-left: 1.25rem;
+		display: flex;
+		align-items: flex-start;
+		gap: 0.7rem;
+		min-height: var(--tap);
+		padding: 0.55rem 0;
+		cursor: pointer;
 	}
-	/* Hollow tick boxes, read-only until progress exists. */
-	.criteria li::before {
-		content: '';
+	.criteria input {
 		position: absolute;
-		left: 0;
-		top: 0.5em;
-		width: 0.65rem;
-		height: 0.65rem;
+		opacity: 0;
+		width: 1.5rem;
+		height: 1.5rem;
+		margin: 0;
+	}
+	.box {
+		flex: none;
+		width: 1.05rem;
+		height: 1.05rem;
+		margin-top: 0.2rem;
 		border: 1.5px solid var(--text-dim);
+		transition: background-color 0.15s;
+	}
+	.criteria input:checked + .box {
+		background: var(--accent);
+		border-color: var(--accent);
+		box-shadow: inset 0 0 0 3px var(--bg-cloud);
+	}
+	.criteria input:focus-visible + .box {
+		outline: 2px solid var(--accent);
+		outline-offset: 2px;
+	}
+	.tempo {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		flex-wrap: wrap;
+	}
+	.best {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+	}
+	.best input {
+		width: 5rem;
+		min-height: var(--tap);
+		padding: 0 0.6rem;
+		background: var(--bg-deep);
+		border: 1px solid var(--line);
+		color: var(--text);
+		font: inherit;
+	}
+	textarea {
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0.6rem;
+		background: var(--bg-deep);
+		border: 1px solid var(--line);
+		color: var(--text);
+		font: inherit;
+		resize: vertical;
+	}
+	.rust-note {
+		padding-left: 0.75rem;
+		border-left: 3px solid var(--rust);
+		color: var(--text);
 	}
 	.hint {
 		font-size: 0.9375rem;

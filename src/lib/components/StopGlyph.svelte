@@ -3,7 +3,18 @@
 
 	// One stop, drawn around (0, 0). Level is never colour alone: outline, half
 	// fill, full fill, halo and ring all differ. Songs are diamonds, skills circles.
-	let { state, kind, r = 14 }: { state: StopState; kind: StopKind; r?: number } = $props();
+	let {
+		state,
+		kind,
+		r = 14,
+		ignite = 0
+	}: {
+		state: StopState;
+		kind: StopKind;
+		r?: number;
+		/** Changes each time the stop levels up, which plays the glow once. 0 is off. */
+		ignite?: number;
+	} = $props();
 
 	const full = $derived(
 		kind === 'song'
@@ -63,8 +74,22 @@
 		<path d={halo(0.5)} fill="var(--clear)" />
 	{/if}
 
+	{#if ignite}
+		{#key ignite}
+			<path class="ignite" d={halo(1)} fill="var(--accent)" />
+		{/key}
+	{/if}
+
 	{#if state.rusting}
-		<!-- a rust smudge over the stop -->
+		<!-- a small cloud of rust gathering over the stop -->
+		<g class="drift">
+			<path
+				transform="translate(0 {-r * 0.55}) scale({r * 1.35})"
+				d="M-1.1 -0.3C-0.9 -1 0.2 -1.25 0.9 -0.7C1.35 -0.2 1.1 0.8 0.3 1.1C-0.5 1.35 -1.3 0.6 -1.1 -0.3Z"
+				fill="var(--rust)"
+				opacity="0.2"
+			/>
+		</g>
 		<path
 			transform="scale({r})"
 			d="M-1.1 -0.3C-0.9 -1 0.2 -1.25 0.9 -0.7C1.35 -0.2 1.1 0.8 0.3 1.1C-0.5 1.35 -1.3 0.6 -1.1 -0.3Z"
@@ -75,6 +100,33 @@
 </g>
 
 <style>
+	.ignite {
+		transform-box: fill-box;
+		transform-origin: center;
+		opacity: 0;
+		animation: ignite 1.8s ease-out;
+	}
+	@keyframes ignite {
+		0% {
+			opacity: 0.55;
+			transform: scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: scale(3.2);
+		}
+	}
+	.drift {
+		animation: drift 9s ease-in-out infinite alternate;
+	}
+	@keyframes drift {
+		from {
+			transform: translateX(-2px);
+		}
+		to {
+			transform: translateX(2px);
+		}
+	}
 	.flicker {
 		animation: flicker 3.2s steps(1, end) infinite;
 	}
@@ -94,7 +146,9 @@
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.flicker {
+		.flicker,
+		.drift,
+		.ignite {
 			animation: none;
 		}
 	}
