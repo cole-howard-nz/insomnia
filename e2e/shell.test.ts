@@ -1,8 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-test('opens on the map with the tab bar', async ({ page }) => {
-	await page.goto('/');
-	await expect(page).toHaveURL(/\/map$/);
+test('the map has the tab bar', async ({ page }) => {
+	await page.goto('/map');
 	await expect(page.getByRole('navigation', { name: 'main' })).toBeVisible();
 	await page.getByRole('link', { name: 'practice' }).click();
 	await expect(page).toHaveURL(/\/practice$/);

@@ -103,7 +103,11 @@ export function indexCurriculum(data: CurriculumData): CurriculumIndex {
 
 /** Screen reader label, e.g. "barre chords, region chords, level 2 of 4, rusting". */
 export function describeStop(stop: StopModel, region: RegionModel | undefined, state: StopState) {
-	const parts = [stop.name, `region ${region?.name ?? stop.regionSlug}`, `level ${state.level} of 4`];
+	const parts = [
+		stop.name,
+		`region ${region?.name ?? stop.regionSlug}`,
+		`level ${state.level} of 4`
+	];
 	if (stop.kind === 'song') parts.splice(1, 0, 'song');
 	if (state.rusting) parts.push('rusting');
 	return parts.join(', ');
