@@ -6,5 +6,7 @@
 //  - ids that come from a URL or form are loaded with `WHERE id = ? AND user_id = ?`
 //  - add new private tables to the list in eslint.config.js
 export * from './settings';
+export * from './progress';
+export * from './practice';
 export * from './export';
 export * from './files';

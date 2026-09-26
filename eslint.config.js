@@ -6,7 +6,17 @@ import { defineConfig, includeIgnoreFile } from 'eslint/config';
 import globals from 'globals';
 import ts from 'typescript-eslint';
 
-const PRIVATE_TABLES = ['users', 'sessions', 'emailTokens', 'userSettings'];
+const PRIVATE_TABLES = [
+	'users',
+	'sessions',
+	'emailTokens',
+	'userSettings',
+	'userStopProgress',
+	'userCriteriaDone',
+	'practiceSessions',
+	'practiceSessionStops',
+	'levelEvents'
+];
 
 const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
