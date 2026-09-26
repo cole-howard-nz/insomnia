@@ -254,6 +254,7 @@
 			gl!.drawArrays(gl!.TRIANGLES, 0, 3);
 		}
 
+		resize();
 		const observer = new ResizeObserver(resize);
 		observer.observe(canvasEl);
 

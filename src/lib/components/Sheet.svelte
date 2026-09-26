@@ -173,6 +173,10 @@
 		overflow-y: auto;
 		overscroll-behavior: contain;
 		padding: 0.5rem 1rem 1.25rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.75rem;
 	}
 	.sr-only {
 		position: absolute;
