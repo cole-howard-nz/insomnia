@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import Button from '$lib/components/Button.svelte';
 	import Stamp from '$lib/components/Stamp.svelte';
 	import type { CurriculumData } from '$lib/curriculum/model';
 	import type { PracticeSession } from '$lib/progress/model';
@@ -94,7 +95,12 @@
 {/if}
 
 {#if data.sessions.length === 0}
-	<p class="text-dim">nothing here yet. that's okay.</p>
+	<p class="text-dim">
+		{data.filter
+			? "nothing logged on this stop yet. that's okay."
+			: "nothing here yet. that's okay. play something, then come log it."}
+	</p>
+	<div><Button href={resolve('/practice')} variant="ghost">start a session</Button></div>
 {:else}
 	{#each days as day (day.date)}
 		<section class="day">

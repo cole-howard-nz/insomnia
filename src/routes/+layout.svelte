@@ -4,6 +4,7 @@
 	import WeatherBackground from '$lib/components/WeatherBackground.svelte';
 	import ToastStack from '$lib/components/ToastStack.svelte';
 	import LoadingOverlay from '$lib/components/LoadingOverlay.svelte';
+	import OfflineNotice from '$lib/components/OfflineNotice.svelte';
 
 	let { children }: { children: Snippet } = $props();
 
@@ -33,6 +34,7 @@
 
 <ToastStack />
 <LoadingOverlay />
+<OfflineNotice />
 
 <style>
 	.app {

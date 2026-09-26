@@ -4,7 +4,28 @@
 	import Stamp from '$lib/components/Stamp.svelte';
 	import { invalidateAll } from '$app/navigation';
 
-	const missing = $derived(page.status === 404);
+	const lines = $derived(
+		page.status === 404
+			? {
+					title: 'nothing here.',
+					body: "that's okay. the page you wanted isn't here.",
+					retry: false
+				}
+			: page.status === 403
+				? {
+						title: 'not yours.',
+						body: "that one belongs to someone else, or isn't yours to open.",
+						retry: false
+					}
+				: page.status === 429
+					? {
+							title: 'slow down a little.',
+							body: 'too many tries in a row. give it a minute.',
+							retry: true
+						}
+					: { title: 'something broke.', body: 'not you. try again.', retry: true }
+	);
+	const home = $derived(page.data.user ? '/map' : '/');
 </script>
 
 <svelte:head><title>{page.status} · insomnia</title></svelte:head>
@@ -12,15 +33,14 @@
 <main>
 	<div class="taped">
 		<Stamp tone="rust">{page.status}</Stamp>
-		<h1>{missing ? 'nothing here.' : 'something broke.'}</h1>
-		<p class="text-dim">
-			{missing ? "that's okay. the page you wanted isn't here." : 'not you. try again.'}
-		</p>
+		<h1>{lines.title}</h1>
+		<p class="text-dim">{lines.body}</p>
 		<div class="actions">
-			{#if !missing}
+			{#if lines.retry}
 				<Button onclick={() => invalidateAll()}>try again</Button>
 			{/if}
-			<Button href="/map" variant="ghost">back to the map</Button>
+			<Button href={home} variant="ghost">{page.data.user ? 'back to the map' : 'back home'}</Button
+			>
 		</div>
 	</div>
 </main>
