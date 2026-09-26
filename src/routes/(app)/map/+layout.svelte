@@ -4,6 +4,9 @@
 	import { resolve } from '$app/paths';
 	import MapView from '$lib/components/MapView.svelte';
 	import StopList from '$lib/components/StopList.svelte';
+	import WhatNext from '$lib/components/WhatNext.svelte';
+	import { celebrate } from '$lib/celebrate.svelte';
+	import { getProgressContext } from '$lib/progress/store.svelte';
 	import { indexCurriculum } from '$lib/curriculum/model';
 	import { mapState } from '$lib/map-state.svelte';
 	import { setMapContext } from '$lib/map-context';
@@ -15,7 +18,8 @@
 		$props();
 
 	const index = $derived(indexCurriculum(data.curriculum));
-	const states = $derived(mapState.for(data.curriculum));
+	const progress = getProgressContext();
+	const states = $derived(mapState.preview ? mapState.for(data.curriculum) : progress.states);
 	const view = $derived(page.url.searchParams.get('view') === 'list' ? 'list' : 'map');
 	const query = $derived(view === 'list' ? '?view=list' : '');
 	const selected = $derived(page.params.stop);
@@ -52,10 +56,19 @@
 	</label>
 {/if}
 
+<WhatNext suggestions={progress.suggestions} {query} />
+
 {#if view === 'map'}
 	<div class="stage">
 		<div class="fill">
-			<MapView {index} {states} {selected} {query} />
+			<MapView
+				{index}
+				{states}
+				{selected}
+				{query}
+				ignited={celebrate.ignited}
+				cleared={progress.summary.cleared}
+			/>
 		</div>
 	</div>
 {:else}

@@ -1,4 +1,4 @@
-import type { CriterionModel, Level, StopModel, StopState } from '$lib/curriculum/model';
+import type { CriterionModel, Level, StopState } from '$lib/curriculum/model';
 import { CLEARED_LEVEL, RUST_DAYS, RUST_WEIGHT, SKY_CLEAR_AT } from './config';
 
 const DAY_MS = 86_400_000;

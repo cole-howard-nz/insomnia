@@ -40,5 +40,4 @@ export interface PracticeSession {
 
 /** A moment worth marking, decided on the server when a level changes. */
 export type Milestone =
-	| { kind: 'first-mastered'; stop: string }
-	| { kind: 'region-cleared'; region: string };
+	{ kind: 'first-mastered'; stop: string } | { kind: 'region-cleared'; region: string };
