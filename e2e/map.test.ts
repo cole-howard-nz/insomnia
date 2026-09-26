@@ -1,16 +1,25 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
-test('the landing page previews the map', async ({ page }) => {
+test('the landing page previews the map and offers sign up', async ({ page }) => {
 	await page.goto('/');
 	await expect(page.getByRole('heading', { name: 'insomnia' })).toBeVisible();
 	await expect(page.getByRole('application', { name: /skill map/ })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'sign up' })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'open the map' })).toHaveCount(0);
+});
+
+test('signed in, the landing page opens the map', async ({ page, signedIn }) => {
+	void signedIn;
+	await page.goto('/');
 	await page.getByRole('link', { name: 'open the map' }).click();
 	await expect(page).toHaveURL(/\/map$/);
 });
 
 test('the map opens zoomed out, tapping a region zooms in, tapping a stop opens it', async ({
-	page
+	page,
+	signedIn
 }) => {
+	void signedIn;
 	await page.goto('/map');
 	const regions = page.getByRole('button', { name: /stops. zoom to region/ });
 	await expect(regions).toHaveCount(7);
@@ -27,7 +36,8 @@ test('the map opens zoomed out, tapping a region zooms in, tapping a stop opens 
 	await expect(page.getByRole('dialog', { name: 'barre chords (f shape)' })).toBeVisible();
 });
 
-test('dragging pans the map and does not open a stop', async ({ page }) => {
+test('dragging pans the map and does not open a stop', async ({ page, signedIn }) => {
+	void signedIn;
 	await page.goto('/map');
 	await page.getByRole('button', { name: /^chords, \d+ stops/ }).click();
 	const group = page.locator('svg > g').first();
@@ -45,7 +55,8 @@ test('dragging pans the map and does not open a stop', async ({ page }) => {
 	await expect(page).toHaveURL(/\/map$/);
 });
 
-test('the zoom buttons and reset work', async ({ page }) => {
+test('the zoom buttons and reset work', async ({ page, signedIn }) => {
+	void signedIn;
 	await page.goto('/map');
 	const group = page.locator('svg > g').first();
 	await page.waitForTimeout(300);
@@ -58,7 +69,11 @@ test('the zoom buttons and reset work', async ({ page }) => {
 	expect(await group.getAttribute('transform')).toBe(fit);
 });
 
-test('a stop deep link shows the whole detail and links jump between stops', async ({ page }) => {
+test('a stop deep link shows the whole detail and links jump between stops', async ({
+	page,
+	signedIn
+}) => {
+	void signedIn;
 	await page.goto('/map/barre-f-shape');
 	const sheet = page.getByRole('dialog', { name: 'barre chords (f shape)' });
 	await expect(sheet).toBeVisible();
@@ -80,14 +95,17 @@ test('a stop deep link shows the whole detail and links jump between stops', asy
 	await expect(page).toHaveURL(/\/map$/);
 });
 
-test('an unknown stop is a 404 in the app voice', async ({ page }) => {
+test('an unknown stop is a 404 in the app voice', async ({ page, signedIn }) => {
+	void signedIn;
 	await page.goto('/map/no-such-stop');
 	await expect(page.getByRole('heading', { name: 'nothing here.' })).toBeVisible();
 });
 
 test('the list view reaches every stop with keyboard and screen reader labels', async ({
-	page
+	page,
+	signedIn
 }) => {
+	void signedIn;
 	await page.goto('/map?view=list');
 	const links = page.getByRole('main').getByRole('link', { name: /level \d of 4$/ });
 	await expect(links).toHaveCount(62);

@@ -1,6 +1,7 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
-test('the map has the tab bar', async ({ page }) => {
+test('the map has the tab bar', async ({ page, signedIn }) => {
+	void signedIn;
 	await page.goto('/map');
 	await expect(page.getByRole('navigation', { name: 'main' })).toBeVisible();
 	await page.getByRole('link', { name: 'practice' }).click();
