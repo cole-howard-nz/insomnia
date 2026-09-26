@@ -25,6 +25,7 @@
 		"icons": "tsx scripts/icons.ts"
 	},
 	"devDependencies": {
+		"@axe-core/playwright": "^4.13.0",
 		"@eslint/js": "^10.0.1",
 		"@playwright/test": "^1.60.0",
 		"@sveltejs/kit": "^2.63.0",
