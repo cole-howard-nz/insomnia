@@ -19,7 +19,7 @@ Kickoff prompt template:
 
 | Phase | File | Goal | Status |
 |---|---|---|---|
-| 0 | [01-phase-0-foundations.md](01-phase-0-foundations.md) | Scaffold, design system, weather background on a phone | Not started |
+| 0 | [01-phase-0-foundations.md](01-phase-0-foundations.md) | Scaffold, design system, weather background on a phone | In progress (phone check and preview deploy pending) |
 | 1 | [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md) | Curriculum data, map, list view, stop detail (no accounts) | Not started |
 | 2 | [03-phase-2-accounts.md](03-phase-2-accounts.md) | Authentication and account management | Not started |
 | 3 | [04-phase-3-core-loop.md](04-phase-3-core-loop.md) | Progress, criteria, practice log, rust, what next, weather | Not started |
@@ -69,6 +69,8 @@ Append newest at the bottom: date, phase, decision, reason.
 | 2026-09-26 | Planning | Vercel project and Neon DB created by owner via Vercel Storage; env pulled to `.env.local` | Phase 0 links to them, does not recreate |
 | 2026-09-26 | Planning | Ignore the `NEON_AUTH_*` and `VITE_NEON_AUTH_URL` vars, keep hand-rolled auth | Neon Auth was provisioned by the integration but the plan owns its sessions and schema. Consider disabling it in Neon |
 | 2026-09-26 | Planning | Never add co-author trailers to commits | Owner rule, recorded in CLAUDE.md |
+| 2026-09-26 | 0 | Playwright runs against the dev server on Pixel 5 emulation | adapter-vercel build needs symlinks, which fail on Windows without Developer Mode; webkit not installed |
+| 2026-09-26 | 0 | Lightened `--text-dim` to `#9296a0`, capped cloud alpha at 0.3 | Secondary text failed AA over the brightest cloud state |
 
 ## Parking lot
 
@@ -80,4 +82,5 @@ Ideas that came up but belong to a later phase or v1.5. Append only.
 
 Each finished phase adds two or three lines here: what exists now, where the key code lives, anything the next session must know.
 
--
+- Phase 0 (code complete, two exit criteria open): scaffold, tokens, UI kit, weather background, tab bar shell. See the handoff notes in [01-phase-0-foundations.md](01-phase-0-foundations.md). Weather store is `src/lib/weather.svelte.ts`, Sheet is `src/lib/components/Sheet.svelte`.
+
