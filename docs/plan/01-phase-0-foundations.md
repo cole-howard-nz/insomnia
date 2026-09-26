@@ -14,7 +14,8 @@ Reference code (read only): `D:\-- cole\Personal\Development\Game Hacking\Projec
 - [ ] Add Tailwind v4, Prettier (with svelte and tailwind plugins), ESLint, Vitest, Playwright, matching munkeware's config where sensible.
 - [ ] Add `.env.example` with every variable the project will need, `.env` gitignored.
 - [ ] npm scripts: dev, build, check, lint, format, test, db:generate, db:migrate, db:push, db:studio, db:seed.
-- [ ] Add Drizzle and Neon config, no tables yet, confirm a connection from a script.
+- [ ] Vercel project (SvelteKit preset) and Neon database (via the Vercel Storage integration) already exist, and `.env.local` was pulled with `vercel env pull`. Do not recreate them. Confirm `.env.local` is gitignored and never print its values.
+- [ ] Add Drizzle and Neon config using `DATABASE_URL` (pooled) and `DATABASE_URL_UNPOOLED` (migrations), no tables yet, confirm a connection from a script.
 - [ ] Write a short README: what it is, how to run it, link to docs.
 
 ### Design system

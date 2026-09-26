@@ -66,6 +66,9 @@ Append newest at the bottom: date, phase, decision, reason.
 | Date | Phase | Decision | Reason |
 |---|---|---|---|
 | 2026-09-26 | Planning | App named Insomnia | Owner choice, fits the late-night rainy mood |
+| 2026-09-26 | Planning | Vercel project and Neon DB created by owner via Vercel Storage; env pulled to `.env.local` | Phase 0 links to them, does not recreate |
+| 2026-09-26 | Planning | Ignore the `NEON_AUTH_*` and `VITE_NEON_AUTH_URL` vars, keep hand-rolled auth | Neon Auth was provisioned by the integration but the plan owns its sessions and schema. Consider disabling it in Neon |
+| 2026-09-26 | Planning | Never add co-author trailers to commits | Owner rule, recorded in CLAUDE.md |
 
 ## Parking lot
 
