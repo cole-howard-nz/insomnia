@@ -175,18 +175,22 @@
 
 <section aria-labelledby="h-data">
 	<h2 id="h-data">your data</h2>
-	<p class="text-dim">everything we hold about you, as a json file.</p>
-	<!-- A download, not a page. Skip client routing so the browser saves the file. -->
-	<div data-sveltekit-reload>
-		<Button href={resolve('/me/export')} variant="ghost">export my data</Button>
+	<p class="text-dim">
+		everything we hold about you. the json file has your progress and notes. the zip adds your
+		recordings.
+	</p>
+	<!-- Downloads, not pages. Skip client routing so the browser saves the file. -->
+	<div class="row" data-sveltekit-reload>
+		<Button href={resolve('/me/export')} variant="ghost">export json</Button>
+		<Button href={resolve('/me/export/zip')} variant="ghost">export zip with recordings</Button>
 	</div>
 </section>
 
 <section aria-labelledby="h-delete">
 	<h2 id="h-delete">delete account</h2>
 	<p class="text-dim">
-		this erases your account and everything in it, right now. there is no undo and no backup to ask
-		for.
+		this erases your account and everything in it, recordings included, right now. there is no undo
+		and no backup to ask for.
 	</p>
 	{#if !confirmDelete}
 		<Button variant="ghost" onclick={() => (confirmDelete = true)}>delete my account</Button>

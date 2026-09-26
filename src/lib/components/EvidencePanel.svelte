@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
+	import { onDestroy, untrack } from 'svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import { celebrate } from '$lib/celebrate.svelte';
@@ -46,10 +46,13 @@
 	}
 	$effect(() => {
 		void stop.slug;
-		clearDraft();
-		mode = 'idle';
-		confirming = null;
-		void load();
+		// A new stop starts clean. Only the slug is tracked, not the draft this resets.
+		untrack(() => {
+			clearDraft();
+			mode = 'idle';
+			confirming = null;
+			void load();
+		});
 	});
 
 	function clearDraft() {

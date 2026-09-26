@@ -22,17 +22,27 @@ export interface Account {
 }
 
 /** Inserts a user directly, so specs do not spend the sign-up rate limit. */
-export async function createAccount(label = 'e2e'): Promise<Account> {
+export async function createAccount(
+	label = 'e2e',
+	options: { verified?: boolean; onboarded?: boolean } = {}
+): Promise<Account> {
+	const { verified = false, onboarded = true } = options;
 	const account = {
 		email: `${label}-${run}-${counter++}@example.test`,
 		name: `${label} tester`,
 		password: PASSWORD
 	};
-	await pool.query('insert into users (email, password_hash, display_name) values ($1, $2, $3)', [
-		account.email,
-		await hash(account.password),
-		account.name
-	]);
+	await pool.query(
+		`insert into users (email, password_hash, display_name, email_verified_at, onboarding_done)
+		 values ($1, $2, $3, $4, $5)`,
+		[
+			account.email,
+			await hash(account.password),
+			account.name,
+			verified ? new Date() : null,
+			onboarded
+		]
+	);
 	return account;
 }
 
