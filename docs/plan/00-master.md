@@ -22,7 +22,7 @@ Kickoff prompt template:
 | 0 | [01-phase-0-foundations.md](01-phase-0-foundations.md) | Scaffold, design system, weather background on a phone | Done (phone perf check and preview deploy deferred by owner) |
 | 1 | [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md) | Curriculum data, map, list view, stop detail (no accounts) | Done (phone smoothness check and preview deploy deferred by owner) |
 | 2 | [03-phase-2-accounts.md](03-phase-2-accounts.md) | Authentication and account management | Done (real emails on a phone and preview deploy deferred by owner) |
-| 3 | [04-phase-3-core-loop.md](04-phase-3-core-loop.md) | Progress, criteria, practice log, rust, what next, weather | In progress (code complete, tested. Two weeks of real use, threshold tuning and preview deploy still open) |
+| 3 | [04-phase-3-core-loop.md](04-phase-3-core-loop.md) | Progress, criteria, practice log, rust, what next, weather | Done (two weeks of real use, threshold tuning, phone check of the sky and preview deploy deferred by owner) |
 | 4 | [05-phase-4-evidence-and-polish.md](05-phase-4-evidence-and-polish.md) | Evidence, timeline, onboarding, landing, privacy | Not started |
 | 5 | [06-phase-5-launch.md](06-phase-5-launch.md) | Deploy, monitoring, abuse controls, launch | Not started |
 
@@ -96,7 +96,7 @@ Append newest at the bottom: date, phase, decision, reason.
 | 2026-09-26 | 3 | Session days come from a `tz` cookie, stored as a local date on each session | Streaks need the player's day, and the account has no timezone. Falls back to UTC until the cookie exists |
 | 2026-09-26 | 3 | Progress writes are JSON endpoints with optimistic updates, not form actions | The level has to change the instant a box is ticked. Writes are queued in order |
 | 2026-09-26 | 3 | The e2e `signedIn` fixture plants a session instead of using the form | The suite was tripping the sign-in rate limit |
-| 2026-09-26 | 3 | Phase 3 code closed, real-use exit criteria left open | Two weeks of use cannot happen in a build session. Tune thresholds and log what felt wrong here after |
+| 2026-09-26 | 3 | Closed phase 3 with two weeks of real use, threshold tuning, phone check and preview deploy unverified | Owner closed the phase, will use it and tune `config.ts` alongside later work, and do the deploy in the final clean-up phase |
 
 ## Parking lot
 
@@ -107,7 +107,7 @@ Ideas that came up but belong to a later phase or v1.5. Append only.
 - Curated resource links to replace the search links.
 - Edit or delete a logged session, and a settings control for the weekly target.
 - Rate limits on the progress and practice endpoints (phase 5 abuse controls).
-- Phase 3 open items: two weeks of real use, tune `src/lib/progress/config.ts`, eyeball the sky moving both ways on a phone, preview deploy.
+- Phase 3 clean-up items: two weeks of real use and tuning `src/lib/progress/config.ts` (log what felt wrong in the decision log), eyeball the sky moving both ways on a phone, preview deploy.
 - Clean-up phase loose ends: phone perf check of map (phase 0, 1), preview deploy and cookie `secure` check, Resend setup and real emails on a phone, Upstash for production, disable Neon Auth, curate resource links.
 
 ## Phase handoff summary
@@ -117,4 +117,4 @@ Each finished phase adds two or three lines here: what exists now, where the key
 - Phase 0 (done, owner deferred phone perf check and preview deploy): scaffold, tokens, UI kit, weather background, tab bar shell. See the handoff notes in [01-phase-0-foundations.md](01-phase-0-foundations.md). Weather store is `src/lib/weather.svelte.ts`, Sheet is `src/lib/components/Sheet.svelte`.
 - Phase 1 (done, owner deferred phone check and preview deploy): curriculum in `src/lib/curriculum/` (62 stops, seeded to Neon), map/list/stop sheet under `src/routes/(app)/map/`, public preview at `/`. `MapView` takes a `states` record, phase 3 feeds it real progress via `src/lib/map-state.svelte.ts`. See handoff notes in [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md).
 - Phase 2 (done, owner deferred real emails on a phone and preview deploy): accounts in `src/lib/server/auth/`, session in `locals.user` and `locals.session`, `(app)` routes guarded by the hook, pages in `(auth)` and `(app)/me`. Private data goes through `src/lib/server/data/` (`userId` first), add new user-owned tables to `PRIVATE_TABLES` in `eslint.config.js` and to `exportUserData`. See handoff notes in [03-phase-2-accounts.md](03-phase-2-accounts.md).
-- Phase 3 (code complete, real-use exit criteria open): pure logic in `src/lib/progress/` with all tuning in `config.ts`, tables in `db/schema/progress.ts`, scoped access in `src/lib/server/data/progress.ts` and `practice.ts`, client state in `ProgressStore` (a context). Practice and log tabs are real, the map shows real state, rust, what next and level-up moments. See handoff notes in [04-phase-3-core-loop.md](04-phase-3-core-loop.md).
+- Phase 3 (done, owner deferred real-use tuning, phone check and preview deploy): pure logic in `src/lib/progress/` with all tuning in `config.ts`, tables in `db/schema/progress.ts`, scoped access in `src/lib/server/data/progress.ts` and `practice.ts`, client state in `ProgressStore` (a context). Practice and log tabs are real, the map shows real state, rust, what next and level-up moments. See handoff notes in [04-phase-3-core-loop.md](04-phase-3-core-loop.md).

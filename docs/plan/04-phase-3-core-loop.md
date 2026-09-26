@@ -42,15 +42,15 @@ Read first: [../02-skill-map.md](../02-skill-map.md), [../01-features.md](../01-
 
 ## Exit criteria
 
-- [ ] The author has used it for real for two weeks and written down what felt wrong in the decision log (thresholds, suggestion quality, missing stops).
-- [ ] Rust thresholds tuned from that use.
+- [ ] (deferred) The author has used it for real for two weeks and written down what felt wrong in the decision log (thresholds, suggestion quality, missing stops).
+- [ ] (deferred) Rust thresholds tuned from that use.
 - [x] Weather tracks progress in both directions (unit tested: rust lowers the value, ticks and sessions raise it). Not yet eyeballed on a phone.
 - [x] Isolation tests pass. Checks, lint, tests pass (124 unit and integration, 28 e2e).
-- [ ] Preview deployed (owner deferred, as in phases 0 to 2).
+- [ ] (deferred) Preview deployed.
 
 ## Handoff notes
 
-**Status: code complete. The real-use exit criteria are still open** (two weeks of use, threshold tuning, preview deploy). Do those, write what felt wrong in the master decision log, then close the phase.
+**Status: done. Owner deferred the real-use exit criteria** (two weeks of use, threshold tuning, preview deploy) to the clean-up phase. When tuning, write what felt wrong in the master decision log.
 
 Where things live:
 - Pure logic, all unit tested, in `src/lib/progress/`: `logic.ts` (level from criteria, rust, progress values), `suggest.ts` (what next), `streak.ts` (dates, streaks), `summary.ts` (overall and per-region), `snapshot.ts` (rows to states, milestone detection). **All tuning numbers are in `config.ts`**: rust days per level, cleared level, rust weight, and `SKY_CLEAR_AT` (progress at which the sky is fully clear).
