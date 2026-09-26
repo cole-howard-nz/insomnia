@@ -40,10 +40,10 @@ Reference code (read only): `D:\-- cole\Personal\Development\Game Hacking\Projec
 ## Exit criteria
 
 - [x] `npm run check`, `lint`, `test` all pass.
-- [ ] Runs on the author's actual phone (over LAN or a preview deploy) at a smooth frame rate, with the cloud and rain visible. (Not yet measured on a phone.)
+- [ ] Runs on the author's actual phone (over LAN or a preview deploy) at a smooth frame rate, with the cloud and rain visible. (Deferred by owner: checked on desktop only, phone check to follow.)
 - [x] With reduced motion enabled, everything is static and readable.
 - [x] Body text passes AA contrast over the brightest weather state.
-- [ ] Deployed to a Vercel preview URL. (Blocked: Vercel CLI not installed, and running it via npx was denied.)
+- [ ] Deployed to a Vercel preview URL. (Deferred by owner: Vercel CLI not installed here, deploy via CLI or git push later.)
 
 ## Handoff notes
 
