@@ -1,9 +1,29 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { resolve } from '$app/paths';
 	import type { Suggestion } from '$lib/progress/suggest';
 	import Stamp from './Stamp.svelte';
 
 	let { suggestions, query = '' }: { suggestions: Suggestion[]; query?: string } = $props();
+
+	// Open when you arrive (so it greets you after sign-in), and stays how you leave it.
+	const KEY = 'insomnia.next-open';
+	let open = $state(true);
+	onMount(() => {
+		try {
+			open = sessionStorage.getItem(KEY) !== 'closed';
+		} catch {
+			// storage blocked, stays open
+		}
+	});
+	function toggled(event: Event) {
+		open = (event.currentTarget as HTMLDetailsElement).open;
+		try {
+			sessionStorage.setItem(KEY, open ? 'open' : 'closed');
+		} catch {
+			// storage blocked, fine
+		}
+	}
 
 	const label = { rusting: 'revisit', 'in-progress': 'push', fresh: 'new' } as const;
 	const tone = { rusting: 'rust', 'in-progress': 'accent', fresh: 'dim' } as const;
@@ -12,7 +32,7 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- every href comes from href(), which calls resolve() -->
 
-<details class="next" open>
+<details class="next" {open} ontoggle={toggled}>
 	<summary>what next?</summary>
 	{#if suggestions.length === 0}
 		<p class="text-dim">nothing to suggest. that's a strange, good place to be.</p>
