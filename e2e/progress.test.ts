@@ -40,7 +40,7 @@ test('tick criteria, log a session, and watch the map change', async ({ page, si
 
 	// Unticking one drops it back to learning.
 	await page.getByRole('dialog').getByRole('checkbox').first().uncheck();
-	await expect(page.getByRole('dialog').getByText('learning', { exact: true })).toBeVisible();
+	await expect(page.getByRole('dialog').locator('.stamp', { hasText: /^learning$/ })).toBeVisible();
 	await page.getByRole('dialog').getByRole('checkbox').first().check();
 
 	// Notes save on leaving the field.
