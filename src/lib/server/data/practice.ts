@@ -13,8 +13,11 @@ export interface NewSession {
 	stops: { stopId: number; bpm: number | null }[];
 }
 
-/** Saves a session and counts it as practice on every stop in it. */
-export async function logSession(userId: string, session: NewSession): Promise<{ id: string }> {
+/** Saves a session and counts it as practice on every stop in it. Also returns the total logged minutes. */
+export async function logSession(
+	userId: string,
+	session: NewSession
+): Promise<{ id: string; totalMinutes: number }> {
 	return db.transaction(async (tx) => {
 		const [row] = await tx
 			.insert(practiceSessions)
@@ -47,7 +50,11 @@ export async function logSession(userId: string, session: NewSession): Promise<{
 				})
 				.where(and(eq(userStopProgress.userId, userId), eq(userStopProgress.stopId, stopId)));
 		}
-		return row;
+		const [total] = await tx
+			.select({ minutes: sql<number>`coalesce(sum(${practiceSessions.minutes}), 0)::int` })
+			.from(practiceSessions)
+			.where(eq(practiceSessions.userId, userId));
+		return { id: row.id, totalMinutes: total.minutes };
 	});
 }
 

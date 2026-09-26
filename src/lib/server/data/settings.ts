@@ -9,12 +9,14 @@ export interface Settings {
 	weeklyTargetDays: number;
 	reducedEffects: boolean;
 	remindersEnabled: boolean;
+	rainSound: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
 	weeklyTargetDays: 3,
 	reducedEffects: false,
-	remindersEnabled: false
+	remindersEnabled: false,
+	rainSound: false
 };
 
 /** Rows are created lazily, so a user with no row gets the defaults. */
@@ -23,7 +25,8 @@ export async function getSettings(userId: string): Promise<Settings> {
 		.select({
 			weeklyTargetDays: userSettings.weeklyTargetDays,
 			reducedEffects: userSettings.reducedEffects,
-			remindersEnabled: userSettings.remindersEnabled
+			remindersEnabled: userSettings.remindersEnabled,
+			rainSound: userSettings.rainSound
 		})
 		.from(userSettings)
 		.where(eq(userSettings.userId, userId));

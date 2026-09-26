@@ -3,7 +3,8 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import Button from '$lib/components/Button.svelte';
-	import { FEELS, type Feel } from '$lib/progress/model';
+	import { celebrate } from '$lib/celebrate.svelte';
+	import { FEELS, type Feel, type Milestone } from '$lib/progress/model';
 	import { send } from '$lib/progress/api';
 	import { getProgressContext } from '$lib/progress/store.svelte';
 	import { pushToast } from '$lib/toast.svelte';
@@ -199,10 +200,11 @@
 				return { slug, bpm: Number.isInteger(n) && n >= 20 && n <= 400 ? n : null };
 			})
 		};
-		const res = await send('/practice/log', body);
+		const res = await send<{ milestones: Milestone[] }>('/practice/log', body);
 		saving = false;
 		if (!res) return;
 		pushToast(`logged. ${minutes} minute${minutes === 1 ? '' : 's'}.`);
+		celebrate.milestones(res.milestones, () => '');
 		discard();
 		await invalidateAll();
 		await goto(resolve('/log'));

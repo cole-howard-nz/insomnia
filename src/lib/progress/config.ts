@@ -14,3 +14,6 @@ export const SKY_CLEAR_AT = 0.5;
 
 /** Weeks on the log's summary strip, and days a session may be logged into the past. */
 export const LOG_PAGE_SIZE = 50;
+
+/** Total hours of logged practice that get a quiet moment. */
+export const HOURS_MILESTONES = [10, 30, 100] as const;

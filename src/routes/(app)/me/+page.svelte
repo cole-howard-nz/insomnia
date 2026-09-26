@@ -6,6 +6,8 @@
 	import PasswordInput from '$lib/components/PasswordInput.svelte';
 	import Stamp from '$lib/components/Stamp.svelte';
 	import { PASSWORD_MIN } from '$lib/auth-constants';
+	import { rainSound } from '$lib/rain-sound.svelte';
+	import { pushToast } from '$lib/toast.svelte';
 
 	let { data, form } = $props();
 	const user = $derived(data.user!);
@@ -22,6 +24,18 @@
 		(form?.action === action ? form.errors : undefined) as
 			Record<string, string | undefined> | undefined;
 	const done = (action: string) => form?.action === action && 'done' in form && form.done;
+
+	async function toggleRain() {
+		const on = !rainSound.enabled;
+		if (on) void rainSound.enable();
+		else rainSound.disable();
+		const res = await fetch('?/rain', {
+			method: 'POST',
+			headers: { 'x-sveltekit-action': 'true' },
+			body: new URLSearchParams({ on: on ? '1' : '' })
+		}).catch(() => null);
+		if (!res?.ok) pushToast("couldn't save that. it'll reset next visit.", 'error');
+	}
 
 	/** Enhance handler: marks the section busy, clears its secrets when finished. */
 	const submit =
@@ -149,6 +163,18 @@
 		{/if}
 		<Button type="submit" variant="ghost" disabled={busy === 'password'}>change password</Button>
 	</form>
+</section>
+
+<section aria-labelledby="h-sound">
+	<h2 id="h-sound">rain sound</h2>
+	<p class="text-dim">
+		optional, off unless you turn it on. a quiet rain under the app that fades as the sky clears.
+	</p>
+	<!-- The tap is what lets the browser start audio, so sound is switched here, then the choice is saved. -->
+	<Button variant="ghost" onclick={toggleRain}>
+		{rainSound.enabled ? 'turn the rain off' : 'turn the rain on'}
+	</Button>
+	<p role="status" class="text-dim">{rainSound.enabled ? 'the rain is on.' : 'the rain is off.'}</p>
 </section>
 
 <section aria-labelledby="h-sessions">

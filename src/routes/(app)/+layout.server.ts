@@ -19,6 +19,7 @@ export async function load(event) {
 		curriculum,
 		progress,
 		weeklyTarget: settings.weeklyTargetDays,
+		rainSound: settings.rainSound,
 		today: userToday(event.cookies),
 		now: Date.now()
 	};

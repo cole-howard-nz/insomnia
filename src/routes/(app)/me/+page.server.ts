@@ -8,6 +8,7 @@ import {
 } from '$lib/server/auth/accounts';
 import { ago } from '$lib/format';
 import { requireUser } from '$lib/server/auth/guards';
+import { updateSettings } from '$lib/server/data';
 import {
 	deleteSessionTokenCookie,
 	invalidateAllUserSessions,
@@ -106,6 +107,13 @@ export const actions = {
 		if (!limit.allowed) return tooMany('resend', limit.retryAfterSeconds);
 		await sendVerification(user);
 		return { action: 'resend', done: true };
+	},
+
+	rain: async (event) => {
+		const { user } = requireUser(event);
+		const on = (await event.request.formData()).get('on') === '1';
+		await updateSettings(user.id, { rainSound: on });
+		return { action: 'rain', done: true };
 	},
 
 	signOut: async (event) => {

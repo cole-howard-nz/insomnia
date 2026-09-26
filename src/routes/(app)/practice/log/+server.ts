@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { requireUser } from '$lib/server/auth/guards';
 import { loadCurriculum } from '$lib/server/curriculum';
 import { logSession } from '$lib/server/data';
+import { hoursCrossed } from '$lib/progress/hours';
+import type { Milestone } from '$lib/progress/model';
 import { userToday } from '$lib/server/today';
 
 const body = z.object({
@@ -34,12 +36,15 @@ export async function POST(event) {
 		if (!stops.some((s) => s.stopId === stop.id)) stops.push({ stopId: stop.id, bpm });
 	}
 
-	const { id } = await logSession(user.id, {
+	const { id, totalMinutes } = await logSession(user.id, {
 		practicedOn: userToday(event.cookies),
 		minutes: input.minutes,
 		feel: input.feel,
 		note: input.note.trim(),
 		stops
 	});
-	return json({ id });
+	const milestones: Milestone[] = hoursCrossed(totalMinutes - input.minutes, totalMinutes).map(
+		(hours) => ({ kind: 'hours', hours })
+	);
+	return json({ id, milestones });
 }

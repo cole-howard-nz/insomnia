@@ -256,7 +256,8 @@ describe.skipIf(!hasDb)('account lifecycle', () => {
 			expect(await data.getSettings(a)).toEqual({
 				weeklyTargetDays: 6,
 				reducedEffects: true,
-				remindersEnabled: true
+				remindersEnabled: true,
+				rainSound: false
 			});
 			expect((await data.getSettings(b)).weeklyTargetDays).toBe(1);
 		});

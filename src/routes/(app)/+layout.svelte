@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import Moment from '$lib/components/Moment.svelte';
+	import RainSound from '$lib/components/RainSound.svelte';
 	import TabBar from '$lib/components/TabBar.svelte';
 	import type { CurriculumData } from '$lib/curriculum/model';
 	import type { ProgressSnapshot } from '$lib/progress/model';
@@ -13,7 +14,12 @@
 		data,
 		children
 	}: {
-		data: { curriculum: CurriculumData; progress: ProgressSnapshot; now: number };
+		data: {
+			curriculum: CurriculumData;
+			progress: ProgressSnapshot;
+			now: number;
+			rainSound: boolean;
+		};
 		children: Snippet;
 	} = $props();
 
@@ -41,6 +47,7 @@
 </main>
 {#if page.url.pathname !== '/welcome'}<TabBar />{/if}
 <Moment />
+<RainSound enabled={data.rainSound} />
 
 <style>
 	main {
