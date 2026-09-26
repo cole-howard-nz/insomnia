@@ -41,11 +41,11 @@ Read first: [../02-skill-map.md](../02-skill-map.md), [../05-architecture.md](..
 ## Exit criteria
 
 - [x] All seven regions and about 60 stops render, every link resolves, every stop opens.
-- [ ] Map is smooth to pan and zoom on the author's phone. (Not measured: needs the owner's phone.)
+- [ ] Map is smooth to pan and zoom on the author's phone. (Deferred by owner: phone check to follow.)
 - [x] Every stop reachable by keyboard and screen reader through the list view.
 - [x] Seed script can be run twice with no changes and no errors.
 - [x] Checks, lint, tests pass.
-- [ ] Preview deployed. (Not done: no Vercel CLI here, same as phase 0. Push or `vercel deploy`, and run `npm run db:seed` against the preview database first if it is not the shared one.)
+- [ ] Preview deployed. (Deferred by owner: no Vercel CLI here, same as phase 0. Push or `vercel deploy`, and run `npm run db:seed` against the preview database first if it is not the shared one.)
 
 ## Handoff notes
 
