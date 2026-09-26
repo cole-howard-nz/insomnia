@@ -10,4 +10,5 @@ export * from './progress';
 export * from './practice';
 export * from './export';
 export * from './evidence';
+export * from './onboarding';
 export * from './files';

@@ -62,7 +62,7 @@ export async function signIn(page: Page, account: Account) {
  * Signs in by planting a session, so specs that are not about signing in do not spend the
  * sign-in rate limit (20 a minute per IP). The sign-in form has its own specs.
  */
-export async function signInFast(page: Page, account: Account) {
+export async function plantSession(page: Page, account: Account) {
 	const token = randomBytes(20).toString('hex');
 	await pool.query(
 		`insert into sessions (id, user_id, device_label, expires_at)
@@ -72,6 +72,10 @@ export async function signInFast(page: Page, account: Account) {
 	await page
 		.context()
 		.addCookies([{ name: 'session', value: token, url: 'http://localhost:4173' }]);
+}
+
+export async function signInFast(page: Page, account: Account) {
+	await plantSession(page, account);
 	await page.goto('/map');
 	await expect(page).toHaveURL(/\/map$/);
 }

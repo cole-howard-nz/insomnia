@@ -6,6 +6,7 @@
 	import type { ProgressSnapshot } from '$lib/progress/model';
 	import { ProgressStore, setProgressContext } from '$lib/progress/store.svelte';
 	import { skyValue } from '$lib/progress/logic';
+	import { page } from '$app/state';
 	import { weather } from '$lib/weather.svelte';
 
 	let {
@@ -38,7 +39,7 @@
 <main>
 	{@render children()}
 </main>
-<TabBar />
+{#if page.url.pathname !== '/welcome'}<TabBar />{/if}
 <Moment />
 
 <style>

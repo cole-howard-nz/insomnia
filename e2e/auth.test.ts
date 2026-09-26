@@ -1,6 +1,6 @@
 import { createAccount, deleteAccount, expect, signIn, test } from './fixtures';
 
-test('signing up lands on the map, and me shows the account', async ({ page }) => {
+test('signing up lands on onboarding, and me shows the account', async ({ page }) => {
 	const email = `signup-${Date.now().toString(36)}@example.test`;
 	try {
 		await page.goto('/sign-up');
@@ -8,6 +8,8 @@ test('signing up lands on the map, and me shows the account', async ({ page }) =
 		await page.getByLabel('email').fill(email);
 		await page.getByLabel('password', { exact: true }).fill('rain on the window');
 		await page.getByRole('button', { name: 'make an account' }).click();
+		await expect(page).toHaveURL(/\/welcome$/);
+		await page.getByRole('button', { name: 'skip it all, just show me the map' }).click();
 		await expect(page).toHaveURL(/\/map$/);
 
 		await page.getByRole('link', { name: 'me', exact: true }).click();
