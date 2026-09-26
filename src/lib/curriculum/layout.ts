@@ -1,3 +1,4 @@
+import { jitter } from './jitter';
 import { collectLinks, type Curriculum, type Layout } from './schema';
 
 // Layout is generated once from the curriculum (npm run curriculum:layout) and
@@ -15,13 +16,6 @@ const PAD_BOTTOM = 75;
 const REGION_W = (COLS - 1) * CELL_X + STAGGER + PAD_X * 2;
 const REGION_GAP_X = 120;
 const REGION_GAP_Y = 100;
-
-/** Stable pseudo-random number in -1..1 from a string. */
-function jitter(seed: string) {
-	let h = 2166136261;
-	for (const ch of seed) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
-	return ((h >>> 0) % 2000) / 1000 - 1;
-}
 
 export function computeLayout(curriculum: Curriculum): Layout {
 	const links = collectLinks(curriculum);
