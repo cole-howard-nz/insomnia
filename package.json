@@ -54,6 +54,7 @@
 		"@fontsource/special-elite": "^5.2.5",
 		"@neondatabase/serverless": "^1.1.0",
 		"@sveltejs/adapter-vercel": "^6.3.4",
-		"drizzle-orm": "^0.45.2"
+		"drizzle-orm": "^0.45.2",
+		"zod": "^4.6.5"
 	}
 }
