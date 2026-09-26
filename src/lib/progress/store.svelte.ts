@@ -17,6 +17,8 @@ export class ProgressStore {
 	data = $state.raw<CurriculumData>({ regions: [], stops: [], links: [] });
 	snapshot = $state.raw<ProgressSnapshot>({ stops: [], criteriaDone: [] });
 	now = $state(0);
+	/** Bumped each time a write has landed on the server, so views built from it can refetch. */
+	saved = $state(0);
 
 	index = $derived(indexCurriculum(this.data));
 	derived = $derived(derive(this.data, this.snapshot, this.now));

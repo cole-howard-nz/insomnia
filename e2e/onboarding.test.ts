@@ -6,6 +6,8 @@ async function fresh(page: import('@playwright/test').Page) {
 	await plantSession(page, account);
 	await page.goto('/map');
 	await expect(page).toHaveURL(/\/welcome$/);
+	// Buttons only work once the page has hydrated.
+	await page.waitForLoadState('networkidle');
 	return account;
 }
 

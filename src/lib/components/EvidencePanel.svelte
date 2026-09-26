@@ -13,6 +13,7 @@
 	import { clock } from '$lib/evidence/recorder';
 	import { buildTimeline, dayLabel, defaultCompare, recordings } from '$lib/evidence/timeline';
 	import type { EvidenceItem, StopEvidence } from '$lib/evidence/types';
+	import { getProgressContext } from '$lib/progress/store.svelte';
 	import { pushToast } from '$lib/toast.svelte';
 	import Button from './Button.svelte';
 	import Recorder from './Recorder.svelte';
@@ -20,6 +21,7 @@
 	/** Recordings and notes on a stop, the timeline of its levels, and day 1 versus day 60. */
 	let { stop }: { stop: StopModel } = $props();
 
+	const progress = getProgressContext();
 	const verified = $derived(page.data.user?.emailVerified ?? false);
 	const justLevelledUp = $derived(celebrate.ignited?.slug === stop.slug);
 
@@ -31,9 +33,10 @@
 	let saving = $state(false);
 	let confirming = $state<string | null>(null);
 
-	async function load() {
+	/** `quiet` refetches without blanking the list, for changes the person just made elsewhere. */
+	async function load(quiet = false) {
 		const slug = stop.slug;
-		loaded = null;
+		if (!quiet) loaded = null;
 		loadFailed = false;
 		try {
 			const res = await fetch(`${resolve('/(app)/evidence')}?stop=${encodeURIComponent(slug)}`);
@@ -53,6 +56,15 @@
 			confirming = null;
 			void load();
 		});
+	});
+
+	// A tick that has just been saved may have added a level event to this stop's timeline.
+	let lastSaved = progress.saved;
+	$effect(() => {
+		const saved = progress.saved;
+		if (saved === lastSaved) return;
+		lastSaved = saved;
+		untrack(() => void load(true));
 	});
 
 	function clearDraft() {
@@ -258,7 +270,7 @@
 
 	{#if loadFailed}
 		<p class="text-dim" role="alert">
-			couldn't load your proof. <button class="link" onclick={load}>try again</button>
+			couldn't load your proof. <button class="link" onclick={() => load()}>try again</button>
 		</p>
 	{:else if loaded === null}
 		<p class="text-dim" role="status">looking…</p>

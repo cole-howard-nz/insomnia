@@ -55,7 +55,10 @@
 			criterionId,
 			done
 		});
-		if (res) celebrate.milestones(res.milestones, (slug) => index.region(slug)?.name ?? slug);
+		if (res) {
+			progress.saved += 1;
+			celebrate.milestones(res.milestones, (slug) => index.region(slug)?.name ?? slug);
+		}
 	}
 
 	async function start() {

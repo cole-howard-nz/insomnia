@@ -139,4 +139,30 @@ describe.skipIf(!hasDb)('evidence data layer', () => {
 		const left = await db.select().from(schema.evidence).where(orm.eq(schema.evidence.userId, id));
 		expect(left).toEqual([]);
 	});
+
+	it('account deletion removes the recordings too, but only after the password checks out', async () => {
+		const accounts = await import('../auth/accounts');
+		const password = 'rain on the window';
+		const signedUp = await accounts.signUp({
+			email: `gone-${run}@example.test`,
+			password,
+			displayName: 'gone'
+		});
+		if (!signedUp.ok) throw new Error('sign up failed');
+		created.push(signedUp.userId);
+		const { key } = await attach(signedUp.userId);
+		const local = path.resolve('.data', 'evidence', key);
+
+		// A wrong password deletes nothing, files included.
+		expect(await accounts.deleteAccount(signedUp.userId, 'not the password!')).toBe(false);
+		expect(existsSync(local)).toBe(true);
+
+		expect(await accounts.deleteAccount(signedUp.userId, password)).toBe(true);
+		expect(existsSync(local)).toBe(false);
+		const left = await db
+			.select()
+			.from(schema.evidence)
+			.where(orm.eq(schema.evidence.userId, signedUp.userId));
+		expect(left).toEqual([]);
+	});
 });
