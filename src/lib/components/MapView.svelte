@@ -92,7 +92,7 @@
 		const start = performance.now();
 		const step = (now: number) => {
 			const t = Math.min(1, (now - start) / ms);
-			view = lerpView(from, target, 1 - Math.pow(1 - t, 3));
+			view = t === 1 ? target : lerpView(from, target, 1 - Math.pow(1 - t, 3));
 			if (t < 1) animation = requestAnimationFrame(step);
 		};
 		animation = requestAnimationFrame(step);

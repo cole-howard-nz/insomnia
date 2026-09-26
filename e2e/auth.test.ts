@@ -10,7 +10,7 @@ test('signing up lands on the map, and me shows the account', async ({ page }) =
 		await page.getByRole('button', { name: 'make an account' }).click();
 		await expect(page).toHaveURL(/\/map$/);
 
-		await page.getByRole('link', { name: 'me' }).click();
+		await page.getByRole('link', { name: 'me', exact: true }).click();
 		await expect(page.getByText(email)).toBeVisible();
 		await expect(page.getByText('not verified')).toBeVisible();
 	} finally {

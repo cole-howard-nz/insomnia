@@ -1,3 +1,4 @@
+import { createHash, randomBytes } from 'node:crypto';
 import { hash } from '@node-rs/argon2';
 import { Pool } from '@neondatabase/serverless';
 import { test as base, expect, type Page } from '@playwright/test';
@@ -47,6 +48,24 @@ export async function signIn(page: Page, account: Account) {
 	await expect(page).toHaveURL(/\/map$/);
 }
 
+/**
+ * Signs in by planting a session, so specs that are not about signing in do not spend the
+ * sign-in rate limit (20 a minute per IP). The sign-in form has its own specs.
+ */
+export async function signInFast(page: Page, account: Account) {
+	const token = randomBytes(20).toString('hex');
+	await pool.query(
+		`insert into sessions (id, user_id, device_label, expires_at)
+		 select $1, id, 'e2e', now() + interval '1 day' from users where email = $2`,
+		[createHash('sha256').update(token).digest('hex'), account.email]
+	);
+	await page
+		.context()
+		.addCookies([{ name: 'session', value: token, url: 'http://localhost:4173' }]);
+	await page.goto('/map');
+	await expect(page).toHaveURL(/\/map$/);
+}
+
 export const test = base.extend<{ account: Account; signedIn: Account }>({
 	// eslint-disable-next-line no-empty-pattern
 	account: async ({}, use) => {
@@ -55,7 +74,7 @@ export const test = base.extend<{ account: Account; signedIn: Account }>({
 		await deleteAccount(account.email);
 	},
 	signedIn: async ({ page, account }, use) => {
-		await signIn(page, account);
+		await signInFast(page, account);
 		await use(account);
 	}
 });
