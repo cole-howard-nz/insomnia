@@ -21,7 +21,7 @@ Kickoff prompt template:
 |---|---|---|---|
 | 0 | [01-phase-0-foundations.md](01-phase-0-foundations.md) | Scaffold, design system, weather background on a phone | Done (phone perf check and preview deploy deferred by owner) |
 | 1 | [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md) | Curriculum data, map, list view, stop detail (no accounts) | Done (phone smoothness check and preview deploy deferred by owner) |
-| 2 | [03-phase-2-accounts.md](03-phase-2-accounts.md) | Authentication and account management | Not started |
+| 2 | [03-phase-2-accounts.md](03-phase-2-accounts.md) | Authentication and account management | Done (real emails on a phone and preview deploy deferred by owner) |
 | 3 | [04-phase-3-core-loop.md](04-phase-3-core-loop.md) | Progress, criteria, practice log, rust, what next, weather | Not started |
 | 4 | [05-phase-4-evidence-and-polish.md](05-phase-4-evidence-and-polish.md) | Evidence, timeline, onboarding, landing, privacy | Not started |
 | 5 | [06-phase-5-launch.md](06-phase-5-launch.md) | Deploy, monitoring, abuse controls, launch | Not started |
@@ -78,6 +78,15 @@ Append newest at the bottom: date, phase, decision, reason.
 | 2026-09-26 | 1 | Cross-region links are only drawn for the open stop | Songs link to skills all over, drawing them all makes the map unreadable |
 | 2026-09-26 | 1 | `/` is the public map preview, the redirect to `/map` is gone | Seed of the phase 4 landing page |
 | 2026-09-26 | 1 | Closed phase 1 with phone smoothness and preview deploy unverified | Owner closed the phase, will check the phone and deploy later |
+| 2026-09-26 | 2 | Everything under the `(app)` route group is guarded in `hooks.server.ts` | Covers pages, loads, actions and endpoints, so no private route can forget the check |
+| 2026-09-26 | 2 | `/map` and stop pages now need an account, `/` stays public | Matches the route sketch. Guest mode is still out of v1 |
+| 2026-09-26 | 2 | Rate limiter falls back to in-memory when Upstash is not configured (was fail open) | Still limits locally and in tests. Best effort on serverless, so set Upstash in production |
+| 2026-09-26 | 2 | Verify and reset links show a button, the token is spent by a POST | Mail scanners that prefetch links cannot burn single-use tokens |
+| 2026-09-26 | 2 | Password reset only emails verified addresses | Per the edge-case table. An unverified account that forgets its password has no self-serve path |
+| 2026-09-26 | 2 | Sign-up reveals that an email is already registered | Core use is not blocked on verification, so hiding it is not possible. Rate limited per IP |
+| 2026-09-26 | 2 | Resend called over HTTP, no SDK. `AUTH_SECRET` dropped | Tokens are random and hashed, nothing is signed, so no secret is needed |
+| 2026-09-26 | 2 | Changing email unverifies it, notifies the old address, and voids pending links | Stops a stolen session quietly moving the account |
+| 2026-09-26 | 2 | Closed phase 2 with real emails on a phone and preview deploy unverified | Owner will do them in the final clean-up phase |
 
 ## Parking lot
 
@@ -86,6 +95,7 @@ Ideas that came up but belong to a later phase or v1.5. Append only.
 - Hand-tuned, less grid-like map layout (phase 1 generates a grid).
 - Toggle to show all cross-region links on the map.
 - Curated resource links to replace the search links.
+- Clean-up phase loose ends: phone perf check of map (phase 0, 1), preview deploy and cookie `secure` check, Resend setup and real emails on a phone, Upstash for production, disable Neon Auth, curate resource links.
 
 ## Phase handoff summary
 
@@ -93,3 +103,4 @@ Each finished phase adds two or three lines here: what exists now, where the key
 
 - Phase 0 (done, owner deferred phone perf check and preview deploy): scaffold, tokens, UI kit, weather background, tab bar shell. See the handoff notes in [01-phase-0-foundations.md](01-phase-0-foundations.md). Weather store is `src/lib/weather.svelte.ts`, Sheet is `src/lib/components/Sheet.svelte`.
 - Phase 1 (done, owner deferred phone check and preview deploy): curriculum in `src/lib/curriculum/` (62 stops, seeded to Neon), map/list/stop sheet under `src/routes/(app)/map/`, public preview at `/`. `MapView` takes a `states` record, phase 3 feeds it real progress via `src/lib/map-state.svelte.ts`. See handoff notes in [02-phase-1-curriculum-and-map.md](02-phase-1-curriculum-and-map.md).
+- Phase 2 (done, owner deferred real emails on a phone and preview deploy): accounts in `src/lib/server/auth/`, session in `locals.user` and `locals.session`, `(app)` routes guarded by the hook, pages in `(auth)` and `(app)/me`. Private data goes through `src/lib/server/data/` (`userId` first), add new user-owned tables to `PRIVATE_TABLES` in `eslint.config.js` and to `exportUserData`. See handoff notes in [03-phase-2-accounts.md](03-phase-2-accounts.md).
