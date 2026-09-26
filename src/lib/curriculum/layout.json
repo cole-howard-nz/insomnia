@@ -1,0 +1,296 @@
+{
+	"regions": {
+		"foundations": {
+			"x": -9,
+			"y": 0,
+			"w": 435,
+			"h": 380
+		},
+		"chords": {
+			"x": 576,
+			"y": 67,
+			"w": 435,
+			"h": 490
+		},
+		"rhythm": {
+			"x": -6,
+			"y": 482,
+			"w": 435,
+			"h": 380
+		},
+		"lead": {
+			"x": 561,
+			"y": 666,
+			"w": 435,
+			"h": 490
+		},
+		"theory": {
+			"x": -9,
+			"y": 951,
+			"w": 435,
+			"h": 380
+		},
+		"tone": {
+			"x": 563,
+			"y": 1267,
+			"w": 435,
+			"h": 270
+		},
+		"songs": {
+			"x": -17,
+			"y": 1426,
+			"w": 435,
+			"h": 490
+		}
+	},
+	"stops": {
+		"posture-and-hold": {
+			"x": 41,
+			"y": 83
+		},
+		"tuning": {
+			"x": 188,
+			"y": 83
+		},
+		"holding-a-pick": {
+			"x": 329,
+			"y": 85
+		},
+		"fretting-basics": {
+			"x": 89,
+			"y": 190
+		},
+		"reading-chord-diagrams": {
+			"x": 233,
+			"y": 200
+		},
+		"reading-tab": {
+			"x": 377,
+			"y": 188
+		},
+		"clean-single-notes": {
+			"x": 44,
+			"y": 306
+		},
+		"finger-independence": {
+			"x": 178,
+			"y": 300
+		},
+		"open-chords-em-am": {
+			"x": 624,
+			"y": 148
+		},
+		"power-chords": {
+			"x": 775,
+			"y": 153
+		},
+		"open-chords-cgd": {
+			"x": 915,
+			"y": 153
+		},
+		"chord-changes": {
+			"x": 679,
+			"y": 268
+		},
+		"sus-and-add": {
+			"x": 822,
+			"y": 265
+		},
+		"seventh-chords": {
+			"x": 960,
+			"y": 263
+		},
+		"capo-basics": {
+			"x": 638,
+			"y": 376
+		},
+		"barre-f-shape": {
+			"x": 771,
+			"y": 369
+		},
+		"ringing-open-shapes": {
+			"x": 911,
+			"y": 375
+		},
+		"open-tunings": {
+			"x": 680,
+			"y": 483
+		},
+		"barre-a-shape": {
+			"x": 821,
+			"y": 474
+		},
+		"metronome-timing": {
+			"x": 43,
+			"y": 574
+		},
+		"downstroke-strumming": {
+			"x": 195,
+			"y": 570
+		},
+		"alternate-picking": {
+			"x": 325,
+			"y": 567
+		},
+		"fingerpicking-patterns": {
+			"x": 94,
+			"y": 680
+		},
+		"strumming-patterns": {
+			"x": 229,
+			"y": 675
+		},
+		"palm-muting": {
+			"x": 374,
+			"y": 674
+		},
+		"muted-strums": {
+			"x": 47,
+			"y": 788
+		},
+		"syncopation": {
+			"x": 182,
+			"y": 793
+		},
+		"odd-time": {
+			"x": 333,
+			"y": 788
+		},
+		"pentatonic-box-1": {
+			"x": 611,
+			"y": 759
+		},
+		"hammer-ons-pull-offs": {
+			"x": 757,
+			"y": 755
+		},
+		"pentatonic-boxes": {
+			"x": 901,
+			"y": 753
+		},
+		"bends": {
+			"x": 665,
+			"y": 868
+		},
+		"twinkly-picking": {
+			"x": 802,
+			"y": 865
+		},
+		"slides": {
+			"x": 942,
+			"y": 865
+		},
+		"vibrato": {
+			"x": 616,
+			"y": 968
+		},
+		"tapping": {
+			"x": 760,
+			"y": 972
+		},
+		"licks-and-phrasing": {
+			"x": 893,
+			"y": 965
+		},
+		"simple-solo": {
+			"x": 661,
+			"y": 1084
+		},
+		"fretboard-notes": {
+			"x": 46,
+			"y": 1033
+		},
+		"fretboard-all": {
+			"x": 180,
+			"y": 1043
+		},
+		"major-scale": {
+			"x": 319,
+			"y": 1032
+		},
+		"intervals": {
+			"x": 96,
+			"y": 1154
+		},
+		"chord-construction": {
+			"x": 237,
+			"y": 1139
+		},
+		"keys-and-progressions": {
+			"x": 375,
+			"y": 1147
+		},
+		"caged": {
+			"x": 41,
+			"y": 1254
+		},
+		"modes": {
+			"x": 188,
+			"y": 1261
+		},
+		"amp-basics": {
+			"x": 621,
+			"y": 1358
+		},
+		"changing-strings": {
+			"x": 758,
+			"y": 1355
+		},
+		"gain-staging": {
+			"x": 891,
+			"y": 1358
+		},
+		"delay-and-reverb": {
+			"x": 667,
+			"y": 1469
+		},
+		"guitar-setup": {
+			"x": 807,
+			"y": 1469
+		},
+		"overdrive-pedal": {
+			"x": 950,
+			"y": 1466
+		},
+		"knockin-on-heavens-door": {
+			"x": 33,
+			"y": 1519
+		},
+		"good-riddance": {
+			"x": 178,
+			"y": 1514
+		},
+		"basket-case": {
+			"x": 326,
+			"y": 1516
+		},
+		"come-as-you-are": {
+			"x": 79,
+			"y": 1620
+		},
+		"the-middle": {
+			"x": 230,
+			"y": 1625
+		},
+		"follow-you-into-the-dark": {
+			"x": 369,
+			"y": 1623
+		},
+		"say-it-aint-so": {
+			"x": 39,
+			"y": 1729
+		},
+		"wonderwall": {
+			"x": 171,
+			"y": 1737
+		},
+		"blackbird": {
+			"x": 325,
+			"y": 1725
+		},
+		"never-meant": {
+			"x": 76,
+			"y": 1837
+		}
+	}
+}
