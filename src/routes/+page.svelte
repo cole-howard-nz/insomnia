@@ -5,7 +5,7 @@
 	import { indexCurriculum, type CurriculumData } from '$lib/curriculum/model';
 
 	// The seed of the landing page (phase 4): a read-only look at the map.
-	let { data }: { data: { curriculum: CurriculumData } } = $props();
+	let { data }: { data: { curriculum: CurriculumData; user: App.Locals['user'] } } = $props();
 	const index = $derived(indexCurriculum(data.curriculum));
 </script>
 
@@ -17,7 +17,14 @@
 		<p class="text-dim">
 			a map of what to learn on guitar, and what you've let go quiet. still up? good time to play.
 		</p>
-		<Button href={resolve('/map')}>open the map</Button>
+		{#if data.user}
+			<Button href={resolve('/map')}>open the map</Button>
+		{:else}
+			<div class="actions">
+				<Button href={resolve('/sign-up')}>sign up</Button>
+				<Button href={resolve('/sign-in')} variant="ghost">sign in</Button>
+			</div>
+		{/if}
 	</header>
 
 	<div class="preview">
@@ -40,6 +47,11 @@
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 0.75rem;
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
 	}
 	.preview {
 		height: 65dvh;
