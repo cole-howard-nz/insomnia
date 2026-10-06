@@ -39,27 +39,29 @@
 
 <svelte:head><title>map · insomnia</title></svelte:head>
 
-<header>
-	<h1>map</h1>
-	<nav aria-label="map view">
-		<a href={resolve('/map')} aria-current={view === 'map' ? 'page' : undefined}>map</a>
-		<a href="{resolve('/map')}?view=list" aria-current={view === 'list' ? 'page' : undefined}
-			>list</a
-		>
-	</nav>
-</header>
+<div class="hud" class:floating={view === 'map'}>
+	<header>
+		<h1>map</h1>
+		<nav aria-label="map view">
+			<a href={resolve('/map')} aria-current={view === 'map' ? 'page' : undefined}>map</a>
+			<a href="{resolve('/map')}?view=list" aria-current={view === 'list' ? 'page' : undefined}
+				>list</a
+			>
+		</nav>
+	</header>
 
-{#if import.meta.env.DEV}
-	<label class="dev">
-		<input type="checkbox" bind:checked={mapState.preview} />
-		dev: preview every state
-	</label>
-{/if}
+	{#if import.meta.env.DEV}
+		<label class="dev">
+			<input type="checkbox" bind:checked={mapState.preview} />
+			dev: preview every state
+		</label>
+	{/if}
 
-<WhatNext suggestions={progress.suggestions} {query} />
+	<WhatNext suggestions={progress.suggestions} {query} />
+</div>
 
 {#if view === 'map'}
-	<div class="stage">
+	<div class="stage" class:bleed={view === 'map'}>
 		<div class="fill">
 			<MapView
 				{index}
@@ -86,8 +88,10 @@
 	}
 	nav {
 		display: flex;
-		border: 1px solid var(--line);
-		background: var(--bg-cloud);
+		border: 1px solid var(--glass-edge);
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: blur(var(--glass-blur));
+		backdrop-filter: blur(var(--glass-blur));
 	}
 	nav a {
 		display: grid;
@@ -122,5 +126,40 @@
 	.fill {
 		position: absolute;
 		inset: 0;
+	}
+	.hud {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	/* Desktop: the map is the whole window, the rail on its left, and the controls float on it
+	   as glass instead of sitting above it in a column. */
+	@media (min-width: 64rem) {
+		.stage.bleed {
+			position: fixed;
+			inset: 0 0 0 var(--rail-w);
+			min-height: 0;
+			margin: 0;
+			z-index: 0;
+		}
+		.hud.floating {
+			position: relative;
+			z-index: 5;
+			width: 23rem;
+			padding: 1.1rem 1.1rem 1.2rem;
+			background: var(--glass-bg);
+			-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+			backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+			border: 1px solid var(--glass-edge);
+			box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7);
+		}
+		.hud.floating h1 {
+			font-size: clamp(3.5rem, 7vw, 6rem);
+			font-weight: 800;
+			font-variation-settings: 'wdth' 75;
+			line-height: 0.85;
+			margin-bottom: -0.2rem;
+		}
 	}
 </style>

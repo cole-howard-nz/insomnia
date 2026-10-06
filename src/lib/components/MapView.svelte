@@ -35,7 +35,8 @@
 		selected,
 		query = '',
 		ignited = null,
-		cleared = []
+		cleared = [],
+		pinWheel = true
 	}: {
 		index: CurriculumIndex;
 		states?: Record<string, StopState>;
@@ -46,6 +47,8 @@
 		ignited?: { slug: string; key: number } | null;
 		/** Regions where every stop is Solid or better: cold light on the district. */
 		cleared?: string[];
+		/** False on a page that scrolls past the map: the wheel only zooms with ctrl or cmd held. */
+		pinWheel?: boolean;
 	} = $props();
 
 	const NODE_R = 14;
@@ -177,6 +180,7 @@
 
 	function onWheel(event: WheelEvent) {
 		if (!view) return;
+		if (!pinWheel && !event.ctrlKey && !event.metaKey) return;
 		event.preventDefault();
 		cancelAnimationFrame(animation);
 		const { x, y } = local(event);
@@ -407,13 +411,28 @@
 	.map:focus-visible {
 		outline-offset: -3px;
 	}
+	/* With a mouse, the map is dark except where the lamp is. Pointer-less devices see it all. */
+	@media (hover: hover) and (pointer: fine) {
+		.map::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+			background: radial-gradient(
+				circle 28rem at var(--lx) var(--ly),
+				transparent 0%,
+				color-mix(in srgb, var(--bg-deep) 52%, transparent) 100%
+			);
+			background-attachment: fixed;
+		}
+	}
 	svg {
 		display: block;
 	}
 
 	.hull {
-		fill: color-mix(in srgb, var(--bg-cloud) 55%, transparent);
-		stroke: var(--line);
+		fill: color-mix(in srgb, var(--bg-cloud) 40%, transparent);
+		stroke: color-mix(in srgb, var(--text) 18%, transparent);
 		stroke-width: 1.5;
 	}
 	.hull.cleared {
@@ -425,9 +444,20 @@
 	}
 	.region-name {
 		font-family: var(--font-display);
+		font-weight: 800;
+		font-variation-settings: 'wdth' 75;
 		fill: var(--text-dim);
-		letter-spacing: 0.02em;
+		letter-spacing: -0.01em;
 		pointer-events: none;
+	}
+	/* On a big screen the district names are huge outlines, the map's own signage. */
+	@media (min-width: 64rem) {
+		.region-name {
+			fill: color-mix(in srgb, var(--text) 5%, transparent);
+			stroke: color-mix(in srgb, var(--text) 38%, transparent);
+			stroke-width: 0.7px;
+			vector-effect: non-scaling-stroke;
+		}
 	}
 	.region-hit {
 		fill: transparent;
@@ -500,14 +530,21 @@
 		place-items: center;
 		width: var(--tap);
 		min-height: var(--tap);
-		background: var(--bg-cloud);
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: blur(var(--glass-blur));
+		backdrop-filter: blur(var(--glass-blur));
 		color: var(--text);
-		border: 1px solid var(--line);
+		border: 1px solid var(--glass-edge);
 		font-family: var(--font-display);
 		font-size: 1.4rem;
 		line-height: 1;
+		z-index: 1;
+	}
+	.controls {
+		z-index: 2;
 	}
 	.controls button:hover {
-		background: var(--bg-cloud-hi);
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 </style>
