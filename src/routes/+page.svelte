@@ -1,30 +1,20 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 	import Button from '$lib/components/Button.svelte';
-	import MapView from '$lib/components/MapView.svelte';
-	import Stamp from '$lib/components/Stamp.svelte';
+	import LandingDemo from '$lib/components/LandingDemo.svelte';
 	import { indexCurriculum, type CurriculumData } from '$lib/curriculum/model';
-	import { DEMO_STATES } from '$lib/landing-demo';
-	import { weather } from '$lib/weather.svelte';
 
 	let { data }: { data: { curriculum: CurriculumData; user: App.Locals['user'] } } = $props();
 	const index = $derived(indexCurriculum(data.curriculum));
 	const deleted = $derived(page.url.searchParams.get('deleted') === '1');
-
-	// Heavy rain to begin with, like a new account. It thins a little for the visitor who stays.
-	onMount(() => {
-		weather.set(0.12);
-		return () => weather.set(0);
-	});
 </script>
 
 <svelte:head>
-	<title>insomnia · a map for learning guitar</title>
+	<title>insomnia</title>
 	<meta
 		name="description"
-		content="a map of what to learn on guitar, and what you've let go quiet. the sky clears as you get better."
+		content="a map of what to learn on guitar, and what you've let go quiet."
 	/>
 	<meta property="og:title" content="insomnia" />
 	<meta
@@ -40,11 +30,10 @@
 
 	<div class="hero">
 		<header>
-			<Stamp tone="accent">still up?</Stamp>
 			<h1>insomnia</h1>
 			<p class="pitch glass">
-				a map of what to learn on guitar, and what you've let go quiet. the sky is the progress bar:
-				heavy rain when you start, breaks in the cloud as you get better.
+				a map of what to learn on guitar, and what you've let go quiet. it's always raining. you're
+				still up.
 			</p>
 			{#if data.user}
 				<Button href={resolve('/map')}>open the map</Button>
@@ -60,10 +49,10 @@
 			<h2 id="preview-heading" class="sr-only">a look at the map</h2>
 			<p class="caption text-dim">
 				{data.curriculum.stops.length} stops in {data.curriculum.regions.length} regions. this is a made-up
-				map a few weeks in. drag it around, nothing here is locked.
+				map a few weeks in. make an account to explore it yourself.
 			</p>
 			<div class="preview">
-				<MapView {index} states={DEMO_STATES} pinWheel={false} />
+				<LandingDemo {index} />
 			</div>
 		</section>
 	</div>
