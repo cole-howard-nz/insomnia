@@ -33,9 +33,12 @@
 					`M${-r * m} 0A${r * m} ${r * m} 0 1 0 ${r * m} 0A${r * m} ${r * m} 0 1 0 ${-r * m} 0Z`
 	);
 	const dim = $derived(state.rusting ? 0.5 : 1);
+	// Focus is skill: a stop you have not touched is a streetlight out of focus through wet glass,
+	// and it sharpens a notch at a time until a mastered one is razor clear. Hover or focus pulls it in.
+	const blur = $derived([2.4, 1.5, 0.7, 0, 0][state.level] ?? 0);
 </script>
 
-<g class="glyph">
+<g class="glyph" style:--blur="{blur}px">
 	{#if state.level === 3}
 		<path d={halo(2.1)} fill="var(--accent)" opacity={0.1 * dim} />
 		<path d={halo(1.5)} fill="var(--accent)" opacity={0.18 * dim} />
@@ -100,6 +103,15 @@
 </g>
 
 <style>
+	.glyph {
+		filter: blur(var(--blur, 0px));
+		transition: filter 0.5s ease-out;
+	}
+	:global(.stop:hover) .glyph,
+	:global(.stop:focus-visible) .glyph,
+	:global(.stop.selected) .glyph {
+		filter: blur(0);
+	}
 	.ignite {
 		transform-box: fill-box;
 		transform-origin: center;
@@ -146,6 +158,9 @@
 		}
 	}
 	@media (prefers-reduced-motion: reduce) {
+		.glyph {
+			transition: none;
+		}
 		.flicker,
 		.drift,
 		.ignite {

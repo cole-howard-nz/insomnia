@@ -167,9 +167,7 @@
 
 <section aria-labelledby="h-sound">
 	<h2 id="h-sound">rain sound</h2>
-	<p class="text-dim">
-		optional, off unless you turn it on. a quiet rain under the app that fades as the sky clears.
-	</p>
+	<p class="text-dim">optional, off unless you turn it on. a quiet rain under the app.</p>
 	<!-- The tap is what lets the browser start audio, so sound is switched here, then the choice is saved. -->
 	<Button variant="ghost" onclick={toggleRain}>
 		{rainSound.enabled ? 'turn the rain off' : 'turn the rain on'}

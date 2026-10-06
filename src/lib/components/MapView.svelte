@@ -35,7 +35,8 @@
 		selected,
 		query = '',
 		ignited = null,
-		cleared = []
+		cleared = [],
+		showcase = false
 	}: {
 		index: CurriculumIndex;
 		states?: Record<string, StopState>;
@@ -46,6 +47,11 @@
 		ignited?: { slug: string; key: number } | null;
 		/** Regions where every stop is Solid or better: cold light on the district. */
 		cleared?: string[];
+		/**
+		 * A look-but-don't-touch map for the public page: the camera tours the regions by itself, and
+		 * nothing responds to the pointer. Using the map takes an account.
+		 */
+		showcase?: boolean;
 	} = $props();
 
 	const NODE_R = 14;
@@ -80,22 +86,72 @@
 
 	const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+	const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+	const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
 	let animation = 0;
-	function animateTo(target: View, ms = 320) {
+	let settle: (() => void) | undefined;
+	/** Eases the camera to `target`. The promise resolves when it arrives (or is cut short). */
+	function animateTo(target: View, ms = 320, ease = easeOut): Promise<void> {
 		cancelAnimationFrame(animation);
-		if (!view) return;
+		settle?.();
+		settle = undefined;
+		if (!view) return Promise.resolve();
 		if (reduced()) {
 			view = target;
-			return;
+			return Promise.resolve();
 		}
 		const from = view;
 		const start = performance.now();
-		const step = (now: number) => {
-			const t = Math.min(1, (now - start) / ms);
-			view = t === 1 ? target : lerpView(from, target, 1 - Math.pow(1 - t, 3));
-			if (t < 1) animation = requestAnimationFrame(step);
-		};
-		animation = requestAnimationFrame(step);
+		return new Promise((resolve) => {
+			settle = resolve;
+			const step = (now: number) => {
+				const t = Math.min(1, (now - start) / ms);
+				view = t === 1 ? target : lerpView(from, target, ease(t));
+				if (t < 1) animation = requestAnimationFrame(step);
+				else {
+					settle = undefined;
+					resolve();
+				}
+			};
+			animation = requestAnimationFrame(step);
+		});
+	}
+
+	// A small camera API, for the public page's scripted demo. The camera glides in and out of
+	// each move, and zoom is interpolated in log space so it feels even.
+	/** Where a stop is on screen right now, or null before the map has a size. */
+	export function project(slug: string) {
+		const stop = index.stop(slug);
+		if (!stop || !view) return null;
+		return { x: stop.x * view.k + view.x, y: stop.y * view.k + view.y };
+	}
+	export function overview(ms = 2400) {
+		atFit = true;
+		return fit ? animateTo(fit, ms, easeInOut) : Promise.resolve();
+	}
+	export function focusRegion(slug: string, ms = 2400, maxK = 1.3) {
+		const region = index.region(slug);
+		if (!region) return Promise.resolve();
+		atFit = false;
+		return animateTo(boxView(region, size, 24, maxK), ms, easeInOut);
+	}
+	/** Brings a stop to a point given as fractions of the map's width and height. */
+	export function focusStop(slug: string, k: number, ax: number, ay: number, ms = 1800) {
+		const stop = index.stop(slug);
+		if (!stop) return Promise.resolve();
+		atFit = false;
+		const target = clampView(centerOn(stop.x, stop.y, k, width * ax, height * ay), world, size);
+		return animateTo(target, ms, easeInOut);
+	}
+	export function panBy(dx: number, dy: number, ms = 1400) {
+		if (!view) return Promise.resolve();
+		atFit = false;
+		return animateTo(
+			clampView({ ...view, x: view.x + dx, y: view.y + dy }, world, size),
+			ms,
+			easeInOut
+		);
 	}
 
 	function moved(next: View) {
@@ -118,6 +174,7 @@
 	};
 
 	function onPointerDown(event: PointerEvent) {
+		if (showcase) return;
 		cancelAnimationFrame(animation);
 		if (pointers.size === 0) didDrag = false;
 		pointers.set(event.pointerId, local(event));
@@ -177,6 +234,7 @@
 
 	function onWheel(event: WheelEvent) {
 		if (!view) return;
+		if (showcase) return;
 		event.preventDefault();
 		cancelAnimationFrame(animation);
 		const { x, y } = local(event);
@@ -203,7 +261,7 @@
 	}
 
 	function onKeyDown(event: KeyboardEvent) {
-		if (event.target !== container || !view) return;
+		if (showcase || event.target !== container || !view) return;
 		const pan = 80;
 		const keys: Record<string, () => void> = {
 			ArrowLeft: () => moved({ ...view!, x: view!.x + pan }),
@@ -227,7 +285,7 @@
 	const ready = $derived(view !== undefined && height > 0);
 	$effect(() => {
 		const slug = selected;
-		if (!ready || slug === lastSelected) return;
+		if (showcase || !ready || slug === lastSelected) return;
 		lastSelected = slug;
 		untrack(() => {
 			const stop = slug ? index.stop(slug) : undefined;
@@ -272,15 +330,18 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- every href comes from href(), which calls resolve() -->
 
-<!-- svelte-ignore a11y_no_noninteractive_tabindex, a11y_no_noninteractive_element_interactions -->
+<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
 	class="map"
 	bind:this={container}
 	bind:clientWidth={width}
 	bind:clientHeight={height}
-	role="application"
-	aria-label="skill map. drag to pan, pinch or scroll to zoom. the list view has everything on it."
-	tabindex="0"
+	class:showcase
+	role={showcase ? 'group' : 'application'}
+	aria-label={showcase
+		? 'animated preview of the skill map'
+		: 'skill map. drag to pan, pinch or scroll to zoom. the list view has everything on it.'}
+	tabindex={showcase ? undefined : 0}
 	onpointerdown={onPointerDown}
 	onpointermove={onPointerMove}
 	onpointerup={onPointerUp}
@@ -293,9 +354,9 @@
 		<svg {width} {height}>
 			<g transform="translate({view.x} {view.y}) scale({view.k})">
 				{#each hulls as { region, path } (region.slug)}
-					<g class="region" class:tappable={!detail}>
+					<g class="region" class:tappable={!detail && !showcase}>
 						<path class="hull" class:cleared={cleared.includes(region.slug)} d={path} />
-						{#if !detail}
+						{#if !detail && !showcase}
 							<rect
 								class="region-hit"
 								x={region.x}
@@ -335,7 +396,7 @@
 					{/each}
 				</g>
 
-				<g class="stops" class:inert={!detail}>
+				<g class="stops" class:inert={!detail || showcase}>
 					{#each index.data.stops as stop (stop.slug)}
 						{@const state = states[stop.slug] ?? UNSEEN}
 						{@const lines = wrapLabel(stop.name)}
@@ -346,7 +407,7 @@
 								href={href(stop.slug)}
 								aria-label={describeStop(stop, index.region(stop.regionSlug), state)}
 								aria-current={selected === stop.slug ? 'true' : undefined}
-								tabindex={detail ? undefined : -1}
+								tabindex={detail && !showcase ? undefined : -1}
 							>
 								<circle class="hit" r={HIT_R} />
 								{#if selected === stop.slug}
@@ -373,20 +434,22 @@
 		</svg>
 	{/if}
 
-	<div class="controls">
-		<button type="button" aria-label="zoom in" onclick={() => zoomBy(1.4)}>+</button>
-		<button type="button" aria-label="zoom out" onclick={() => zoomBy(1 / 1.4)}>&minus;</button>
-		<button type="button" aria-label="reset view" onclick={reset}>
-			<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-				<path
-					d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"
-					stroke="currentColor"
-					stroke-width="1.8"
-					stroke-linecap="square"
-				/>
-			</svg>
-		</button>
-	</div>
+	{#if !showcase}
+		<div class="controls">
+			<button type="button" aria-label="zoom in" onclick={() => zoomBy(1.4)}>+</button>
+			<button type="button" aria-label="zoom out" onclick={() => zoomBy(1 / 1.4)}>&minus;</button>
+			<button type="button" aria-label="reset view" onclick={reset}>
+				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+					<path
+						d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"
+						stroke="currentColor"
+						stroke-width="1.8"
+						stroke-linecap="square"
+					/>
+				</svg>
+			</button>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -404,16 +467,37 @@
 	.map:active {
 		cursor: grabbing;
 	}
+	/* Look, don't touch: the page scrolls past it, and clicks fall through. */
+	.map.showcase {
+		cursor: default;
+		touch-action: pan-y;
+		pointer-events: none;
+	}
 	.map:focus-visible {
 		outline-offset: -3px;
+	}
+	/* With a mouse, the map is dark except where the lamp is. Pointer-less devices see it all. */
+	@media (hover: hover) and (pointer: fine) {
+		.map::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			pointer-events: none;
+			background: radial-gradient(
+				circle 28rem at var(--lx) var(--ly),
+				transparent 0%,
+				color-mix(in srgb, var(--bg-deep) 52%, transparent) 100%
+			);
+			background-attachment: fixed;
+		}
 	}
 	svg {
 		display: block;
 	}
 
 	.hull {
-		fill: color-mix(in srgb, var(--bg-cloud) 55%, transparent);
-		stroke: var(--line);
+		fill: color-mix(in srgb, var(--bg-cloud) 40%, transparent);
+		stroke: color-mix(in srgb, var(--text) 18%, transparent);
 		stroke-width: 1.5;
 	}
 	.hull.cleared {
@@ -425,9 +509,20 @@
 	}
 	.region-name {
 		font-family: var(--font-display);
+		font-weight: 800;
+		font-variation-settings: 'wdth' 75;
 		fill: var(--text-dim);
-		letter-spacing: 0.02em;
+		letter-spacing: -0.01em;
 		pointer-events: none;
+	}
+	/* On a big screen the district names are huge outlines, the map's own signage. */
+	@media (min-width: 64rem) {
+		.region-name {
+			fill: color-mix(in srgb, var(--text) 5%, transparent);
+			stroke: color-mix(in srgb, var(--text) 38%, transparent);
+			stroke-width: 0.7px;
+			vector-effect: non-scaling-stroke;
+		}
 	}
 	.region-hit {
 		fill: transparent;
@@ -500,14 +595,21 @@
 		place-items: center;
 		width: var(--tap);
 		min-height: var(--tap);
-		background: var(--bg-cloud);
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: blur(var(--glass-blur));
+		backdrop-filter: blur(var(--glass-blur));
 		color: var(--text);
-		border: 1px solid var(--line);
+		border: 1px solid var(--glass-edge);
 		font-family: var(--font-display);
 		font-size: 1.4rem;
 		line-height: 1;
+		z-index: 1;
+	}
+	.controls {
+		z-index: 2;
 	}
 	.controls button:hover {
-		background: var(--bg-cloud-hi);
+		color: var(--accent);
+		border-color: var(--accent);
 	}
 </style>

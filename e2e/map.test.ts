@@ -3,7 +3,9 @@ import { expect, test } from './fixtures';
 test('the landing page previews the map and offers sign up', async ({ page }) => {
 	await page.goto('/');
 	await expect(page.getByRole('heading', { name: 'insomnia' })).toBeVisible();
-	await expect(page.getByRole('application', { name: /skill map/ })).toBeVisible();
+	// The public preview plays by itself. Only the signed-in map is an application you can drive.
+	await expect(page.getByRole('group', { name: /preview of the skill map/ })).toBeVisible();
+	await expect(page.getByRole('application', { name: /skill map/ })).toHaveCount(0);
 	await expect(page.getByRole('link', { name: 'make an account' })).toBeVisible();
 	await expect(page.getByRole('link', { name: 'open the map' })).toHaveCount(0);
 });

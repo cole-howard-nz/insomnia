@@ -111,9 +111,11 @@
 		max-height: 85dvh;
 		padding: 0 0 var(--safe-bottom);
 		box-sizing: border-box;
-		background: var(--bg-cloud);
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+		backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
 		color: var(--text);
-		border: 1px solid var(--line);
+		border: 1px solid var(--glass-edge);
 		border-bottom: none;
 		overflow: hidden;
 		flex-direction: column;
@@ -127,7 +129,51 @@
 		transition: none;
 	}
 	.sheet::backdrop {
-		background: color-mix(in srgb, var(--bg-deep) 75%, transparent);
+		background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
+	}
+
+	/* Desktop: not a sheet from below but a pane of glass sliding in from the right, with the map
+	   still readable (and the lamp still lit) beside it. */
+	@media (min-width: 64rem) {
+		.sheet {
+			inset: 0 0 0 auto;
+			margin: 0;
+			width: 30rem;
+			max-width: 90vw;
+			height: 100dvh;
+			max-height: none;
+			border-width: 0 0 0 1px;
+			padding: 1rem 0 0;
+		}
+		.sheet[open] {
+			animation: slide 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+		.sheet::backdrop {
+			background: linear-gradient(
+				to left,
+				color-mix(in srgb, var(--bg-deep) 60%, transparent),
+				transparent 70%
+			);
+		}
+		.grab {
+			display: none;
+		}
+		.head h2 {
+			font-size: 2.4rem;
+			font-weight: 800;
+			font-variation-settings: 'wdth' 75;
+			line-height: 0.95;
+		}
+		.head {
+			align-items: flex-start;
+			padding-top: 0.5rem;
+		}
+	}
+	@keyframes slide {
+		from {
+			transform: translateX(100%);
+			opacity: 0.4;
+		}
 	}
 	@keyframes rise {
 		from {
