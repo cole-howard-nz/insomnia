@@ -61,4 +61,13 @@
 		flex-direction: column;
 		gap: 1rem;
 	}
+
+	/* Desktop: the nav rail owns the left edge, and pages get room to breathe. */
+	@media (min-width: 64rem) {
+		main {
+			max-width: 70rem;
+			margin: 0;
+			padding: 3rem 4rem 3rem calc(var(--rail-w) + 4rem);
+		}
+	}
 </style>

@@ -17,7 +17,10 @@
 		page.url.pathname === href || page.url.pathname.startsWith(`${href}/`);
 </script>
 
-<nav class="tabbar" aria-label="main">
+<nav class="tabbar glass" aria-label="main">
+	<a class="mark" href={resolve('/')} aria-label="insomnia home" tabindex="-1" aria-hidden="true"
+		><span>insomnia</span></a
+	>
 	{#each tabs as tab (tab.href)}
 		<a href={resolve(tab.href)} aria-current={active(tab.href) ? 'page' : undefined}>
 			<svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -35,19 +38,23 @@
 </nav>
 
 <style>
+	/* Mobile: a dock of glass floating over the thumb zone, a small lamp lit over the open tab. */
 	.tabbar {
 		position: fixed;
-		inset: auto 0 0 0;
+		inset: auto 0.75rem calc(0.6rem + var(--safe-bottom)) 0.75rem;
 		z-index: 20;
 		display: grid;
 		grid-template-columns: repeat(4, 1fr);
-		height: calc(var(--tabbar-h) + var(--safe-bottom));
-		padding: 0 var(--safe-right) var(--safe-bottom) var(--safe-left);
+		height: var(--tabbar-h);
 		box-sizing: border-box;
-		background: var(--bg-cloud);
-		border-top: 1px solid var(--line);
+		max-width: 26rem;
+		margin-inline: auto;
 	}
-	a {
+	.mark {
+		display: none;
+	}
+	a:not(.mark) {
+		position: relative;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -58,8 +65,74 @@
 		font-size: 0.75rem;
 		text-decoration: none;
 		letter-spacing: 0.06em;
+		transition: color 0.2s;
 	}
 	a[aria-current='page'] {
 		color: var(--accent);
+	}
+	a[aria-current='page']::before {
+		content: '';
+		position: absolute;
+		top: -1px;
+		left: 50%;
+		width: 1.6rem;
+		height: 2px;
+		translate: -50% 0;
+		background: var(--accent);
+		box-shadow:
+			0 0 12px 2px color-mix(in srgb, var(--accent) 70%, transparent),
+			0 6px 18px 4px color-mix(in srgb, var(--accent) 30%, transparent);
+	}
+
+	/* Desktop: a rail down the left edge. The name runs vertically, the destinations stack under it. */
+	@media (min-width: 64rem) {
+		.tabbar {
+			inset: 0 auto 0 0;
+			width: var(--rail-w);
+			max-width: none;
+			height: auto;
+			margin: 0;
+			grid-template-columns: none;
+			grid-template-rows: 1fr repeat(4, auto);
+			border-width: 0 1px 0 0;
+			padding: 1.5rem 0 1.5rem;
+			gap: 0.35rem;
+		}
+		.mark {
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			text-decoration: none;
+		}
+		.mark span {
+			writing-mode: vertical-rl;
+			transform: rotate(180deg);
+			font-family: var(--font-display);
+			font-size: 2.6rem;
+			font-weight: 800;
+			font-variation-settings: 'wdth' 75;
+			letter-spacing: -0.02em;
+			line-height: 1;
+			color: transparent;
+			-webkit-text-stroke: 1px color-mix(in srgb, var(--text) 55%, transparent);
+			transition: color 0.3s;
+		}
+		.mark:hover span {
+			color: var(--accent);
+			-webkit-text-stroke-color: var(--accent);
+		}
+		a:not(.mark) {
+			min-height: 4.25rem;
+		}
+		a[aria-current='page']::before {
+			top: 50%;
+			left: 0;
+			width: 2px;
+			height: 1.8rem;
+			translate: 0 -50%;
+		}
+		a:not(.mark):hover {
+			color: var(--text);
+		}
 	}
 </style>
