@@ -2,12 +2,13 @@
 	import type { Snippet } from 'svelte';
 
 	import { resolve } from '$app/paths';
+	import Logo from '$lib/components/Logo.svelte';
 
 	let { children }: { children: Snippet } = $props();
 </script>
 
 <main>
-	<a class="home" href={resolve('/')}>insomnia</a>
+	<a class="home" href={resolve('/')}><Logo size={28} />insomnia</a>
 	<div class="taped">
 		{@render children()}
 	</div>
@@ -27,6 +28,9 @@
 			calc(var(--safe-bottom) + 1.5rem) calc(var(--safe-left) + 1rem);
 	}
 	.home {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.6rem;
 		font-family: var(--font-display);
 		font-size: 1.25rem;
 		color: var(--text-dim);

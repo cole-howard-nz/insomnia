@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Logo from './Logo.svelte';
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
 
@@ -19,7 +20,7 @@
 
 <nav class="tabbar glass" aria-label="main">
 	<a class="mark" href={resolve('/')} aria-label="insomnia home" tabindex="-1" aria-hidden="true"
-		><span>insomnia</span></a
+		><Logo size={36} /><span>insomnia</span></a
 	>
 	{#each tabs as tab (tab.href)}
 		<a href={resolve(tab.href)} aria-current={active(tab.href) ? 'page' : undefined}>
@@ -100,8 +101,10 @@
 		}
 		.mark {
 			display: flex;
-			justify-content: center;
-			align-items: flex-start;
+			flex-direction: column;
+			gap: 1rem;
+			justify-content: flex-start;
+			align-items: center;
 			text-decoration: none;
 		}
 		.mark span {
