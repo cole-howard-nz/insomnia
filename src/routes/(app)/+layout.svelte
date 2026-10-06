@@ -1,14 +1,12 @@
 <script lang="ts">
-	import { onMount, type Snippet } from 'svelte';
+	import type { Snippet } from 'svelte';
 	import Moment from '$lib/components/Moment.svelte';
 	import RainSound from '$lib/components/RainSound.svelte';
 	import TabBar from '$lib/components/TabBar.svelte';
 	import type { CurriculumData } from '$lib/curriculum/model';
 	import type { ProgressSnapshot } from '$lib/progress/model';
 	import { ProgressStore, setProgressContext } from '$lib/progress/store.svelte';
-	import { skyValue } from '$lib/progress/logic';
 	import { page } from '$app/state';
-	import { weather } from '$lib/weather.svelte';
 
 	let {
 		data,
@@ -30,16 +28,6 @@
 	// whenever the layout data does (after a session is logged, say).
 	sync();
 	$effect.pre(sync);
-
-	// The sky follows progress, in both directions: a rusting stop closes it back in.
-	$effect(() => {
-		weather.set(store.summary.sky);
-		for (const [slug, value] of Object.entries(store.summary.regions)) {
-			weather.setRegion(slug, skyValue(value));
-		}
-	});
-	// Leaving the app (sign out) goes back to the heavy sky of the public page.
-	onMount(() => () => weather.set(0));
 </script>
 
 <main>
