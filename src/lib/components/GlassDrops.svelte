@@ -2,7 +2,7 @@
 	import { onMount } from 'svelte';
 
 	// Raindrops on the pane you are looking through, as opposed to the rain beyond it. Small lens
-	// drops sit still, a few run down the glass in stick-and-slip jumps and leave a wet trail.
+	// drops sit still and now and then one slips a little way down the glass.
 	// Drawn on one 2D canvas above the page, never intercepting a pointer, and kept tiny and
 	// sparse so it never covers text for long.
 	let canvas: HTMLCanvasElement | undefined = $state();
@@ -13,7 +13,6 @@
 		r: number;
 		vy: number; // 0 for a drop that is stuck
 		hold: number; // seconds until it lets go again
-		trail: boolean;
 	};
 
 	onMount(() => {
@@ -29,21 +28,12 @@
 		let w = 0;
 		let h = 0;
 		let drops: Drop[] = [];
-		let trails: { x: number; y: number; r: number; life: number }[] = [];
 		let raf = 0;
 		let last = 0;
 
 		const rand = (a: number, b: number) => a + Math.random() * (b - a);
 		const make = (): Drop => {
-			const big = Math.random() < 0.12;
-			return {
-				x: rand(0, w),
-				y: rand(0, h),
-				r: big ? rand(5, 9) : rand(1.4, 4),
-				vy: 0,
-				hold: big ? rand(0.5, 6) : rand(8, 60),
-				trail: big
-			};
+			return { x: rand(0, w), y: rand(0, h), r: rand(1.4, 4), vy: 0, hold: rand(8, 60) };
 		};
 
 		function resize() {
@@ -58,8 +48,6 @@
 		}
 
 		function lens(d: Drop) {
-			// the big ones sit in front of the text, so they are the faintest
-			ctx!.globalAlpha = d.trail ? 0.4 : 1;
 			const g = ctx!.createRadialGradient(d.x, d.y + d.r * 0.25, d.r * 0.15, d.x, d.y, d.r);
 			g.addColorStop(0, 'rgba(160,190,210,0.02)');
 			g.addColorStop(0.7, 'rgba(10,12,16,0.22)');
@@ -74,18 +62,11 @@
 			ctx!.beginPath();
 			ctx!.arc(d.x - d.r * 0.3, d.y - d.r * 0.38, Math.max(0.6, d.r * 0.2), 0, Math.PI * 2);
 			ctx!.fill();
-			ctx!.globalAlpha = 1;
 		}
 
 		function draw(dt: number) {
 			ctx!.setTransform(dpr, 0, 0, dpr, 0, 0);
 			ctx!.clearRect(0, 0, w, h);
-			for (const t of trails) {
-				t.life -= dt;
-				ctx!.fillStyle = `rgba(170,200,220,${Math.max(0, t.life) * 0.05})`;
-				ctx!.fillRect(t.x - t.r * 0.35, t.y, t.r * 0.7, t.r * 1.6);
-			}
-			trails = trails.filter((t) => t.life > 0);
 			for (let i = 0; i < drops.length; i++) {
 				const d = drops[i];
 				if (!reduced.matches) {
@@ -95,7 +76,6 @@
 						d.y += d.vy * dt;
 						d.x += Math.sin(d.y * 0.05) * 0.15;
 						d.vy *= 0.9 + Math.random() * 0.08;
-						if (d.trail) trails.push({ x: d.x, y: d.y - d.r, r: d.r, life: 8 });
 						if (d.vy < 6) {
 							d.vy = 0;
 							d.hold = rand(0.4, 5);
