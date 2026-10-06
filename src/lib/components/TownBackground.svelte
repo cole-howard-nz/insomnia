@@ -25,7 +25,7 @@
 </script>
 
 <div class="town" aria-hidden="true">
-	<svg viewBox="0 0 1600 300" preserveAspectRatio="xMidYMax slice">
+	<svg viewBox="0 140 1600 130" preserveAspectRatio="xMidYMax slice">
 		<defs>
 			<radialGradient id="lamp-glow">
 				<stop offset="0" stop-color="#e2932c" stop-opacity="0.55" />
@@ -95,7 +95,7 @@
 	.town {
 		position: fixed;
 		inset: auto 0 0 0;
-		height: min(38vh, 22rem);
+		height: min(21vh, 11.5rem);
 		z-index: 1;
 		pointer-events: none;
 	}

@@ -58,6 +58,8 @@
 		}
 
 		function lens(d: Drop) {
+			// the big ones sit in front of the text, so they are the faintest
+			ctx!.globalAlpha = d.trail ? 0.4 : 1;
 			const g = ctx!.createRadialGradient(d.x, d.y + d.r * 0.25, d.r * 0.15, d.x, d.y, d.r);
 			g.addColorStop(0, 'rgba(160,190,210,0.02)');
 			g.addColorStop(0.7, 'rgba(10,12,16,0.22)');
@@ -72,6 +74,7 @@
 			ctx!.beginPath();
 			ctx!.arc(d.x - d.r * 0.3, d.y - d.r * 0.38, Math.max(0.6, d.r * 0.2), 0, Math.PI * 2);
 			ctx!.fill();
+			ctx!.globalAlpha = 1;
 		}
 
 		function draw(dt: number) {
