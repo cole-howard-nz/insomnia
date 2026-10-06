@@ -4,6 +4,8 @@
 	import { onNavigate } from '$app/navigation';
 	import { weather } from '$lib/weather.svelte';
 	import GlassDrops from '$lib/components/GlassDrops.svelte';
+	import Lightning from '$lib/components/Lightning.svelte';
+	import TownBackground from '$lib/components/TownBackground.svelte';
 	import Lamp from '$lib/components/Lamp.svelte';
 	import WeatherBackground from '$lib/components/WeatherBackground.svelte';
 	import ToastStack from '$lib/components/ToastStack.svelte';
@@ -48,6 +50,8 @@
 </svelte:head>
 
 <WeatherBackground />
+<TownBackground />
+<Lightning />
 <Lamp />
 <GlassDrops />
 <div class="grain" aria-hidden="true"></div>
