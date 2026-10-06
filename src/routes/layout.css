@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/bricolage-grotesque/wdth.css';
 @import '@fontsource/special-elite/latin-400.css';
 @import '@fontsource/ibm-plex-mono/latin-400.css';
 @import '@fontsource/ibm-plex-mono/latin-500.css';
@@ -15,11 +16,25 @@
 	--rust: #8f3a30;
 	--clear: #9fc4d6;
 
-	--font-display: 'Special Elite', 'Courier New', monospace;
+	/* Display is a variable face so weight and width can move with scroll. Special Elite stays
+	   for stamps: the photocopied relic in an otherwise glassy night. */
+	--font-display: 'Bricolage Grotesque Variable', 'Arial Narrow', sans-serif;
+	--font-stamp: 'Special Elite', 'Courier New', monospace;
 	--font-body: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
 	--tap: 2.75rem; /* 44px minimum tap target */
 	--tabbar-h: 3.5rem;
+	--rail-w: 5.5rem; /* desktop nav rail */
+
+	/* 0 = clear glass, 1 = fogged. Set from the sky: heavy weather fogs the panes. */
+	--fog: 1;
+	--glass-blur: calc(10px + var(--fog) * 12px);
+	--glass-bg: color-mix(in srgb, var(--bg-cloud) calc(52% + var(--fog) * 22%), transparent);
+	--glass-edge: color-mix(in srgb, var(--text) 16%, transparent);
+
+	/* The streetlight that follows the cursor. Parked off to the side until it moves. */
+	--lx: 70vw;
+	--ly: 30vh;
 	--safe-top: env(safe-area-inset-top, 0px);
 	--safe-bottom: env(safe-area-inset-bottom, 0px);
 	--safe-left: env(safe-area-inset-left, 0px);
@@ -38,6 +53,7 @@
 	--color-clear: var(--clear);
 	--font-display: var(--font-display);
 	--font-body: var(--font-body);
+	--font-stamp: var(--font-stamp);
 }
 
 @layer base {
@@ -66,11 +82,13 @@
 		font-family: var(--font-display);
 		font-weight: 400;
 		line-height: 1.15;
-		letter-spacing: 0.01em;
+		letter-spacing: -0.015em;
+		font-variation-settings: 'wdth' 82;
+		font-weight: 600;
 		margin: 0;
 	}
 	h1 {
-		font-size: 2rem;
+		font-size: 2.25rem;
 	}
 	h2 {
 		font-size: 1.5rem;
@@ -168,27 +186,67 @@
 	color: var(--clear);
 }
 
-/* Card slightly askew, held up with a strip of tape. */
+/* A pane of fogged glass. The fog thins as the sky clears (see --fog). */
+.glass {
+	position: relative;
+	background:
+		linear-gradient(160deg, color-mix(in srgb, var(--text) 9%, transparent), transparent 38%),
+		var(--glass-bg);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+	backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+	border: 1px solid var(--glass-edge);
+	border-top-color: color-mix(in srgb, var(--text) 26%, transparent);
+	box-shadow:
+		0 18px 40px -18px rgb(0 0 0 / 0.7),
+		inset 0 1px 0 color-mix(in srgb, var(--text) 10%, transparent);
+}
+
+/* Existing cards keep their class and become glass. A strip of tape survives as a rain streak. */
 .taped {
 	position: relative;
-	background: var(--bg-cloud);
-	border: 1px solid var(--line);
+	background:
+		linear-gradient(160deg, color-mix(in srgb, var(--text) 9%, transparent), transparent 38%),
+		var(--glass-bg);
+	-webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+	backdrop-filter: blur(var(--glass-blur)) saturate(1.2);
+	border: 1px solid var(--glass-edge);
 	padding: 1.25rem 1rem 1rem;
-	transform: rotate(0.6deg);
-}
-.taped-alt {
-	transform: rotate(-0.7deg);
+	box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7);
 }
 .taped::before {
 	content: '';
 	position: absolute;
-	top: -0.55rem;
-	left: 50%;
-	width: 4.5rem;
-	height: 1.1rem;
-	transform: translateX(-50%) rotate(-2deg);
-	background: color-mix(in srgb, var(--text) 14%, transparent);
-	border: 1px solid color-mix(in srgb, var(--text) 10%, transparent);
+	top: 0;
+	right: 1.4rem;
+	width: 2px;
+	height: 3.2rem;
+	background: linear-gradient(
+		to bottom,
+		transparent,
+		color-mix(in srgb, var(--clear) 55%, transparent)
+	);
+	border-radius: 2px;
+	pointer-events: none;
+}
+
+/* Wiping the fog: the new page sharpens in as the old one clouds out. */
+@keyframes fog-out {
+	to {
+		opacity: 0;
+		filter: blur(10px);
+	}
+}
+@keyframes fog-in {
+	from {
+		opacity: 0;
+		filter: blur(14px);
+	}
+}
+::view-transition-old(root) {
+	animation: 220ms ease-in both fog-out;
+}
+::view-transition-new(root) {
+	animation: 420ms ease-out 120ms both fog-in;
 }
 
 /* Form controls */
@@ -196,9 +254,9 @@
 	width: 100%;
 	box-sizing: border-box;
 	padding: 0.5rem 0.75rem;
-	background: var(--bg-cloud);
+	background: color-mix(in srgb, var(--bg-deep) 55%, transparent);
 	color: var(--text);
-	border: 1px solid var(--line);
+	border: 1px solid var(--glass-edge);
 	border-radius: 0;
 	font: inherit;
 }
